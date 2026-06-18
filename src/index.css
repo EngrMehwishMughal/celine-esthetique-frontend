@@ -7,9 +7,21 @@
 }
 
 :root {
-  font-family: Arial, sans-serif;
-  color: #08060d;
-  background: #ffffff;
+  --luxury-gold: #D4AF37;
+  --deep-rose: #B76E79;
+  --elegant-black: #1A1A1A;
+  --soft-blush: #F9E4E0;
+  --white: #FFFFFF;
+  --warm-gray: #9CA3AF;
+  --sage-green: #87A96B;
+  --burgundy: #800020;
+
+  --font-heading: "Playfair Display", serif;
+  --font-body: "Montserrat", sans-serif;
+
+  font-family: var(--font-body);
+  color: var(--elegant-black);
+  background: var(--white);
 }
 
 html,
@@ -17,8 +29,6 @@ body,
 #root {
   width: 100%;
   min-height: 100%;
-  margin: 0;
-  padding: 0;
 }
 
 body {
