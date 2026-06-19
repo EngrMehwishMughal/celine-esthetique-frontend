@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
@@ -20,21 +18,11 @@
   --font-body: "Montserrat", sans-serif;
 
   font-family: var(--font-body);
-  color: var(--elegant-black);
-  background: var(--white);
 }
 
 html,
 body,
 #root {
   width: 100%;
-  min-height: 100%;
-}
-
-body {
-  overflow-x: hidden;
-}
-
-p {
-  margin: 0;
+  min-height: 100vh;
 }
