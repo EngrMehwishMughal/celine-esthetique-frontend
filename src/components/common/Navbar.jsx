@@ -17,10 +17,27 @@ const Navbar = () => {
           <li className="hover:text-[#D4AF37] transition-colors cursor-pointer">CONTACT</li>
         </ul>
 
-        {/* Button */}
-        <button className="hidden md:block bg-[#D4AF37] text-[#1A1A1A] 'px-7' 'py-3' rounded-full font-['Montserrat'] text-[14px] font-semibold hover:bg-[#C5A028] transition-all duration-300">
-          BOOK NOW
-        </button>
+        <button
+  className="
+    hidden md:block
+    bg-[#D4AF37]
+    text-black
+    px-8
+    py-3
+    rounded-full
+    font-['Montserrat']
+    text-sm
+    tracking-wider
+    font-semibold
+    shadow-md
+    hover:scale-105
+    hover:bg-[#C5A028]
+    transition-all
+    duration-300
+  "
+>
+  BOOK NOW
+</button>
 
       </div>
     </nav>

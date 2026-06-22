@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-  addService,
-  getServices,
-  updateService,
-  deleteService,
-} from "../services/firebase/serviceService";
+  addBlog,
+  getBlogs,
+  updateBlog,
+  deleteBlog,
+} from "../services/firebase/blogService";
 
 import AdminPageHeader from "../components/admin/AdminPageHeader";
 import AdminButton from "../components/admin/AdminButton";
@@ -13,35 +13,36 @@ import EmptyState from "../components/admin/EmptyState";
 import ConfirmDeleteModal from "../components/admin/ConfirmDeleteModal";
 
 const initialFormData = {
-  name: "",
+  title: "",
   category: "",
-  duration: "",
-  price: "",
+  author: "Admin",
+  status: "draft",
+  content: "",
 };
 
-const AdminServices = () => {
-  const [services, setServices] = useState([]);
-  const [formData, setFormData] = useState(initialFormData);
+const AdminBlog = () => {
+  const [blogs, setBlogs] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState(initialFormData);
 
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedServiceId, setSelectedServiceId] = useState(null);
+  const [selectedBlogId, setSelectedBlogId] = useState(null);
 
-  const fetchServices = async () => {
+  const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const data = await getServices();
-      setServices(data);
+      const data = await getBlogs();
+      setBlogs(data);
     } catch (error) {
-      console.error("Error fetching services:", error);
+      console.error("Error fetching blogs:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchServices();
+    fetchBlogs();
   }, []);
 
   const resetForm = () => {
@@ -58,82 +59,84 @@ const AdminServices = () => {
     }));
   };
 
+  const validateForm = () => {
+    if (!formData.title || !formData.category || !formData.content) {
+      alert("Please fill title, category, and content.");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      !formData.name ||
-      !formData.category ||
-      !formData.duration ||
-      !formData.price
-    ) {
-      alert("Please fill all fields.");
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       if (editingId) {
-        await updateService(editingId, formData);
+        await updateBlog(editingId, formData);
       } else {
-        await addService(formData);
+        await addBlog(formData);
       }
 
       resetForm();
-      fetchServices();
+      fetchBlogs();
     } catch (error) {
-      console.error("Error saving service:", error);
+      console.error("Error saving blog:", error);
     }
   };
 
-  const handleEdit = (service) => {
-    setEditingId(service.id);
+  const handleEdit = (blog) => {
+    setEditingId(blog.id);
 
     setFormData({
-      name: service.name || "",
-      category: service.category || "",
-      duration: service.duration || "",
-      price: service.price || "",
+      title: blog.title || "",
+      category: blog.category || "",
+      author: blog.author || "Admin",
+      status: blog.status || "draft",
+      content: blog.content || "",
     });
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const openDeleteModal = (id) => {
-    setSelectedServiceId(id);
+    setSelectedBlogId(id);
     setDeleteModalOpen(true);
   };
 
   const handleDelete = async () => {
     try {
-      await deleteService(selectedServiceId);
-      fetchServices();
+      await deleteBlog(selectedBlogId);
+      fetchBlogs();
     } catch (error) {
-      console.error("Error deleting service:", error);
+      console.error("Error deleting blog:", error);
     } finally {
       setDeleteModalOpen(false);
-      setSelectedServiceId(null);
+      setSelectedBlogId(null);
     }
   };
 
   if (loading) {
-    return <Loader text="Loading services..." />;
+    return <Loader text="Loading blogs..." />;
   }
 
   return (
     <div className="min-h-screen bg-[#F9E4E0] p-4 md:p-8">
       <AdminPageHeader
-        title="Service Management"
-        subtitle="Add, update, and delete Celine Esthétique services."
+        title="Blog Management"
+        subtitle="Create, update, publish, and manage blog posts."
       />
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 grid grid-cols-1 gap-4 rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-4"
+        className="mb-8 grid grid-cols-1 gap-4 rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-4"
       >
         <input
-          name="name"
-          placeholder="Service Name"
-          value={formData.name}
+          name="title"
+          placeholder="Blog Title"
+          value={formData.title}
           onChange={handleChange}
           className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
@@ -147,25 +150,36 @@ const AdminServices = () => {
         />
 
         <input
-          name="duration"
-          placeholder="Duration"
-          value={formData.duration}
+          name="author"
+          placeholder="Author"
+          value={formData.author}
           onChange={handleChange}
           className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
-          name="price"
-          placeholder="Price"
-          value={formData.price}
+        <select
+          name="status"
+          value={formData.status}
           onChange={handleChange}
           className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
+        >
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+        </select>
+
+        <textarea
+          name="content"
+          placeholder="Blog Content"
+          value={formData.content}
+          onChange={handleChange}
+          rows="4"
+          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37] lg:col-span-4"
         />
 
-        <div className="flex gap-3 md:col-span-4">
+        <div className="flex gap-3 lg:col-span-4">
           <AdminButton
             type="submit"
-            text={editingId ? "Update Service" : "Add Service"}
+            text={editingId ? "Update Blog" : "Add Blog"}
             variant="primary"
           />
 
@@ -179,53 +193,55 @@ const AdminServices = () => {
         </div>
       </form>
 
-      {services.length === 0 ? (
+      {blogs.length === 0 ? (
         <EmptyState
-          title="No Services Found"
-          message="You haven’t added any services yet."
+          title="No Blogs Found"
+          message="You haven’t added any blog posts yet."
         />
       ) : (
         <div className="overflow-x-auto rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)]">
           <table className="w-full font-['Montserrat'] text-[14px]">
             <thead>
               <tr className="border-b text-left text-[#9CA3AF]">
-                <th className="pb-4">Service</th>
+                <th className="pb-4">Title</th>
                 <th className="pb-4">Category</th>
-                <th className="pb-4">Duration</th>
-                <th className="pb-4">Price</th>
+                <th className="pb-4">Author</th>
+                <th className="pb-4">Status</th>
                 <th className="pb-4">Actions</th>
               </tr>
             </thead>
 
             <tbody>
-              {services.map((service) => (
-                <tr key={service.id} className="border-b last:border-none">
+              {blogs.map((blog) => (
+                <tr key={blog.id} className="border-b last:border-none">
                   <td className="py-4 font-medium text-[#1A1A1A]">
-                    {service.name}
+                    {blog.title}
                   </td>
 
                   <td className="py-4 text-[#9CA3AF]">
-                    {service.category}
+                    {blog.category}
                   </td>
 
                   <td className="py-4 text-[#9CA3AF]">
-                    {service.duration}
+                    {blog.author || "Admin"}
                   </td>
 
-                  <td className="py-4 font-bold text-[#D4AF37]">
-                    {service.price}
+                  <td className="py-4">
+                    <span className="rounded-full bg-[#F9E4E0] px-4 py-2 text-[12px] capitalize text-[#B76E79]">
+                      {blog.status}
+                    </span>
                   </td>
 
                   <td className="flex gap-3 py-4">
                     <button
-                      onClick={() => handleEdit(service)}
+                      onClick={() => handleEdit(blog)}
                       className="font-semibold text-[#B76E79]"
                     >
                       Edit
                     </button>
 
                     <button
-                      onClick={() => openDeleteModal(service.id)}
+                      onClick={() => openDeleteModal(blog.id)}
                       className="font-semibold text-[#800020]"
                     >
                       Delete
@@ -240,8 +256,8 @@ const AdminServices = () => {
 
       <ConfirmDeleteModal
         isOpen={deleteModalOpen}
-        title="Delete Service"
-        message="Are you sure you want to delete this service?"
+        title="Delete Blog"
+        message="Are you sure you want to delete this blog post?"
         onCancel={() => setDeleteModalOpen(false)}
         onConfirm={handleDelete}
       />
@@ -249,4 +265,4 @@ const AdminServices = () => {
   );
 };
 
-export default AdminServices;
+export default AdminBlog;
