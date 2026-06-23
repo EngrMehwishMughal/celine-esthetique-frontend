@@ -1,0 +1,80 @@
+export const bookingServices = [
+  {
+    id: "manicure-classic",
+    category: "Nails and Pedicure",
+    name: "Classic Manicure",
+    duration: 45,
+    price: 55,
+  },
+  {
+    id: "pedicure-classic",
+    category: "Nails and Pedicure",
+    name: "Classic Pedicure",
+    duration: 60,
+    price: 65,
+  },
+  {
+    id: "gel-manicure",
+    category: "Nails and Pedicure",
+    name: "Gel Manicure",
+    duration: 60,
+    price: 75,
+  },
+  {
+    id: "facial-radiance",
+    category: "Aesthetic",
+    name: "Radiance Facial",
+    duration: 75,
+    price: 120,
+  },
+  {
+    id: "facial-hydrating",
+    category: "Aesthetic",
+    name: "Hydrating Facial",
+    duration: 60,
+    price: 95,
+  },
+  {
+    id: "body-scrub",
+    category: "Aesthetic",
+    name: "Body Scrub Treatment",
+    duration: 90,
+    price: 140,
+  },
+  {
+    id: "lash-lift",
+    category: "Eyelash Lift",
+    name: "Eyelash Lift",
+    duration: 60,
+    price: 85,
+  },
+  {
+    id: "lash-tint",
+    category: "Eyelash Lift",
+    name: "Lash Lift & Tint",
+    duration: 75,
+    price: 105,
+  },
+  {
+    id: "foot-beauty",
+    category: "Simple Foot Beauty",
+    name: "Foot Beauty Treatment",
+    duration: 45,
+    price: 60,
+  },
+  {
+    id: "foot-spa",
+    category: "Simple Foot Beauty",
+    name: "Foot Spa Deluxe",
+    duration: 60,
+    price: 80,
+  },
+];
+
+export const BOOKING_STEPS = [
+  { id: 1, label: "Service" },
+  { id: 2, label: "Date" },
+  { id: 3, label: "Time" },
+  { id: 4, label: "Details" },
+  { id: 5, label: "Confirm" },
+];

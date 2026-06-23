@@ -3,15 +3,15 @@ import HomePage from "../pages/HomePage";
 import Services from "../pages/Services";
 import About from "../pages/About";
 import Contact from "../pages/Contact";
-import Gallery from "../pages/Gallery";
+import BookingPage from "../pages/BookingPage";
 
 const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/booking" element={<BookingPage />} />
       <Route path="/services" element={<Services />} />
       <Route path="/about" element={<About />} />
-      <Route path="/gallery" element={<Gallery />} />
       <Route path="/contact" element={<Contact />} />
     </Routes>
   );

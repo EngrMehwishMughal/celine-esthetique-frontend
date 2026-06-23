@@ -7,15 +7,16 @@
 }
 
 :root {
-  --luxury-gold: #D4AF37;
-  --deep-rose: #B76E79;
+  --primary-pink: #E1709A;
+  --primary-pink-dark: #D85A87;
+  --primary-pink-nav: #D66A9E;
+  --cta-pink: #E85A8A;
   --elegant-black: #1A1A1A;
-  --soft-blush: #F9E4E0;
   --white: #FFFFFF;
-  --warm-gray: #9CA3AF;
-  --sage-green: #87A96B;
-  --burgundy: #800020;
+  --warm-gray: #6B7280;
+  --light-border: #F0F0F0;
 
+  --font-script: "Great Vibes", cursive;
   --font-heading: "Playfair Display", serif;
   --font-body: "Montserrat", sans-serif;
 
