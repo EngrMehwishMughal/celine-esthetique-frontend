@@ -1,0 +1,13 @@
+@theme {
+    --color-primaryPink: #E83E8C;
+    --color-softPink: #FCE4EC;
+    --color-darkText: #1A1A1A;
+    --color-greyText: #6B7280;
+    --color-gold: #D4AF37;
+    --color-danger: #800020;
+    --color-success: #87A96B;
+  
+    --font-heading: "Playfair Display", serif;
+    --font-body: "Poppins", sans-serif;
+    --font-script: "Great Vibes", cursive;
+  }

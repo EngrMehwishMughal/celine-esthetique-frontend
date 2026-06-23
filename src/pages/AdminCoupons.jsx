@@ -6,11 +6,17 @@ import {
   deleteCoupon,
 } from "../services/firebase/couponService";
 
+import { showSuccess, showError } from "../utils/toast";
+
 import AdminPageHeader from "../components/admin/AdminPageHeader";
 import AdminButton from "../components/admin/AdminButton";
+import AdminInput from "../components/admin/AdminInput";
+import AdminSelect from "../components/admin/AdminSelect";
+import AdminTable from "../components/admin/AdminTable";
 import Loader from "../components/admin/Loader";
 import EmptyState from "../components/admin/EmptyState";
 import ConfirmDeleteModal from "../components/admin/ConfirmDeleteModal";
+import StatusBadge from "../components/admin/StatusBadge";
 
 const initialFormData = {
   code: "",
@@ -35,6 +41,7 @@ const AdminCoupons = () => {
       setCoupons(data);
     } catch (error) {
       console.error("Error fetching coupons:", error);
+      showError("Failed to load coupons.");
     } finally {
       setLoading(false);
     }
@@ -54,25 +61,18 @@ const AdminCoupons = () => {
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value.toUpperCase(),
-    }));
-  };
-
-  const handleDiscountChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      discount: e.target.value,
+      [name]: name === "code" ? value.toUpperCase() : value,
     }));
   };
 
   const validateForm = () => {
     if (!formData.code || !formData.discount || !formData.expiry) {
-      alert("Please fill coupon code, discount, and expiry date.");
+      showError("Please fill coupon code, discount, and expiry date.");
       return false;
     }
 
     if (Number(formData.discount) <= 0 || Number(formData.discount) > 100) {
-      alert("Discount must be between 1 and 100.");
+      showError("Discount must be between 1 and 100.");
       return false;
     }
 
@@ -87,14 +87,17 @@ const AdminCoupons = () => {
     try {
       if (editingId) {
         await updateCoupon(editingId, formData);
+        showSuccess("Coupon updated successfully.");
       } else {
         await addCoupon(formData);
+        showSuccess("Coupon created successfully.");
       }
 
+      await fetchCoupons();
       resetForm();
-      fetchCoupons();
     } catch (error) {
       console.error("Error saving coupon:", error);
+      showError("Failed to save coupon.");
     }
   };
 
@@ -119,9 +122,11 @@ const AdminCoupons = () => {
   const handleDelete = async () => {
     try {
       await deleteCoupon(selectedCouponId);
-      fetchCoupons();
+      showSuccess("Coupon deleted successfully.");
+      await fetchCoupons();
     } catch (error) {
       console.error("Error deleting coupon:", error);
+      showError("Failed to delete coupon.");
     } finally {
       setDeleteModalOpen(false);
       setSelectedCouponId(null);
@@ -133,7 +138,7 @@ const AdminCoupons = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9E4E0] p-4 md:p-8">
+    <div className="min-h-screen bg-softPink p-4 md:p-6 lg:p-8">
       <AdminPageHeader
         title="Coupons & Promotions"
         subtitle="Manage discount codes and promotional campaigns."
@@ -141,52 +146,48 @@ const AdminCoupons = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)]"
+        className="mb-8 rounded-[24px] border border-softPink bg-white p-5 shadow-[0_8px_20px_rgba(0,0,0,0.08)]"
       >
-        <h2 className="mb-6 font-['Playfair_Display'] text-[28px]">
+        <h2 className="mb-6 font-heading text-2xl font-semibold text-darkText md:text-3xl">
           {editingId ? "Update Promotion" : "New Promotion"}
         </h2>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-          <input
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <AdminInput
             name="code"
             type="text"
             placeholder="Coupon Code"
             value={formData.code}
             onChange={handleChange}
-            className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
           />
 
-          <input
+          <AdminInput
             name="discount"
             type="number"
             placeholder="Discount %"
             value={formData.discount}
-            onChange={handleDiscountChange}
-            className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
+            onChange={handleChange}
           />
 
-          <input
+          <AdminInput
             name="expiry"
             type="date"
             value={formData.expiry}
             onChange={handleChange}
-            className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
           />
 
-          <select
+          <AdminSelect
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
           >
             <option value="active">Active</option>
             <option value="expired">Expired</option>
             <option value="disabled">Disabled</option>
-          </select>
+          </AdminSelect>
         </div>
 
-        <div className="mt-5 flex gap-3">
+        <div className="mt-5 flex flex-wrap gap-3">
           <AdminButton
             type="submit"
             text={editingId ? "Update Coupon" : "Create Coupon"}
@@ -209,59 +210,46 @@ const AdminCoupons = () => {
           message="You haven’t created any discount coupons yet."
         />
       ) : (
-        <div className="overflow-x-auto rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)]">
-          <table className="w-full font-['Montserrat'] text-[14px]">
-            <thead>
-              <tr className="border-b text-left text-[#9CA3AF]">
-                <th className="pb-4">Code</th>
-                <th className="pb-4">Discount</th>
-                <th className="pb-4">Expiry Date</th>
-                <th className="pb-4">Status</th>
-                <th className="pb-4">Actions</th>
-              </tr>
-            </thead>
+        <AdminTable
+          headers={["Code", "Discount", "Expiry Date", "Status", "Actions"]}
+        >
+          {coupons.map((coupon) => (
+            <tr
+              key={coupon.id}
+              className="border-b border-softPink transition-colors hover:bg-softPink/30 last:border-none"
+            >
+              <td className="py-4 font-medium text-darkText">
+                {coupon.code}
+              </td>
 
-            <tbody>
-              {coupons.map((coupon) => (
-                <tr key={coupon.id} className="border-b last:border-none">
-                  <td className="py-4 font-medium text-[#1A1A1A]">
-                    {coupon.code}
-                  </td>
+              <td className="py-4 font-semibold text-gold">
+                {coupon.discount}%
+              </td>
 
-                  <td className="py-4 font-bold text-[#D4AF37]">
-                    {coupon.discount}%
-                  </td>
+              <td className="py-4 text-greyText">
+                {coupon.expiry}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {coupon.expiry}
-                  </td>
+              <td className="py-4">
+                <StatusBadge status={coupon.status} />
+              </td>
 
-                  <td className="py-4">
-                    <span className="rounded-full bg-[#F9E4E0] px-4 py-2 text-[12px] capitalize text-[#B76E79]">
-                      {coupon.status}
-                    </span>
-                  </td>
+              <td className="flex flex-wrap gap-3 py-4">
+                <AdminButton
+                  text="Edit"
+                  variant="secondary"
+                  onClick={() => handleEdit(coupon)}
+                />
 
-                  <td className="flex gap-3 py-4">
-                    <button
-                      onClick={() => handleEdit(coupon)}
-                      className="font-semibold text-[#B76E79]"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => openDeleteModal(coupon.id)}
-                      className="font-semibold text-[#800020]"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                <AdminButton
+                  text="Delete"
+                  variant="danger"
+                  onClick={() => openDeleteModal(coupon.id)}
+                />
+              </td>
+            </tr>
+          ))}
+        </AdminTable>
       )}
 
       <ConfirmDeleteModal

@@ -6,11 +6,17 @@ import {
   deleteBlog,
 } from "../services/firebase/blogService";
 
+import { showSuccess, showError } from "../utils/toast";
+
 import AdminPageHeader from "../components/admin/AdminPageHeader";
 import AdminButton from "../components/admin/AdminButton";
+import AdminInput from "../components/admin/AdminInput";
+import AdminSelect from "../components/admin/AdminSelect";
+import AdminTable from "../components/admin/AdminTable";
 import Loader from "../components/admin/Loader";
 import EmptyState from "../components/admin/EmptyState";
 import ConfirmDeleteModal from "../components/admin/ConfirmDeleteModal";
+import StatusBadge from "../components/admin/StatusBadge";
 
 const initialFormData = {
   title: "",
@@ -36,6 +42,7 @@ const AdminBlog = () => {
       setBlogs(data);
     } catch (error) {
       console.error("Error fetching blogs:", error);
+      showError("Failed to load blogs.");
     } finally {
       setLoading(false);
     }
@@ -61,7 +68,7 @@ const AdminBlog = () => {
 
   const validateForm = () => {
     if (!formData.title || !formData.category || !formData.content) {
-      alert("Please fill title, category, and content.");
+      showError("Please fill title, category, and content.");
       return false;
     }
 
@@ -76,14 +83,17 @@ const AdminBlog = () => {
     try {
       if (editingId) {
         await updateBlog(editingId, formData);
+        showSuccess("Blog updated successfully.");
       } else {
         await addBlog(formData);
+        showSuccess("Blog added successfully.");
       }
 
+      await fetchBlogs();
       resetForm();
-      fetchBlogs();
     } catch (error) {
       console.error("Error saving blog:", error);
+      showError("Failed to save blog.");
     }
   };
 
@@ -109,9 +119,11 @@ const AdminBlog = () => {
   const handleDelete = async () => {
     try {
       await deleteBlog(selectedBlogId);
-      fetchBlogs();
+      showSuccess("Blog deleted successfully.");
+      await fetchBlogs();
     } catch (error) {
       console.error("Error deleting blog:", error);
+      showError("Failed to delete blog.");
     } finally {
       setDeleteModalOpen(false);
       setSelectedBlogId(null);
@@ -123,7 +135,7 @@ const AdminBlog = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9E4E0] p-4 md:p-8">
+    <div className="min-h-screen bg-softPink p-4 md:p-6 lg:p-8">
       <AdminPageHeader
         title="Blog Management"
         subtitle="Create, update, publish, and manage blog posts."
@@ -131,41 +143,37 @@ const AdminBlog = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 grid grid-cols-1 gap-4 rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-4"
+        className="mb-8 grid grid-cols-1 gap-4 rounded-[24px] border border-softPink bg-white p-5 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-4"
       >
-        <input
+        <AdminInput
           name="title"
           placeholder="Blog Title"
           value={formData.title}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="category"
           placeholder="Category"
           value={formData.category}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="author"
           placeholder="Author"
           value={formData.author}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <select
+        <AdminSelect
           name="status"
           value={formData.status}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         >
           <option value="draft">Draft</option>
           <option value="published">Published</option>
-        </select>
+        </AdminSelect>
 
         <textarea
           name="content"
@@ -173,10 +181,10 @@ const AdminBlog = () => {
           value={formData.content}
           onChange={handleChange}
           rows="4"
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37] lg:col-span-4"
+          className="w-full rounded-[14px] border border-softPink bg-white px-4 py-3 font-body text-darkText outline-none transition-all duration-300 focus:border-primaryPink focus:ring-2 focus:ring-softPink md:col-span-2 lg:col-span-4"
         />
 
-        <div className="flex gap-3 lg:col-span-4">
+        <div className="flex flex-wrap gap-3 md:col-span-2 lg:col-span-4">
           <AdminButton
             type="submit"
             text={editingId ? "Update Blog" : "Add Blog"}
@@ -199,59 +207,46 @@ const AdminBlog = () => {
           message="You haven’t added any blog posts yet."
         />
       ) : (
-        <div className="overflow-x-auto rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)]">
-          <table className="w-full font-['Montserrat'] text-[14px]">
-            <thead>
-              <tr className="border-b text-left text-[#9CA3AF]">
-                <th className="pb-4">Title</th>
-                <th className="pb-4">Category</th>
-                <th className="pb-4">Author</th>
-                <th className="pb-4">Status</th>
-                <th className="pb-4">Actions</th>
-              </tr>
-            </thead>
+        <AdminTable
+          headers={["Title", "Category", "Author", "Status", "Actions"]}
+        >
+          {blogs.map((blog) => (
+            <tr
+              key={blog.id}
+              className="border-b border-softPink transition-colors hover:bg-softPink/30 last:border-none"
+            >
+              <td className="py-4 font-medium text-darkText">
+                {blog.title}
+              </td>
 
-            <tbody>
-              {blogs.map((blog) => (
-                <tr key={blog.id} className="border-b last:border-none">
-                  <td className="py-4 font-medium text-[#1A1A1A]">
-                    {blog.title}
-                  </td>
+              <td className="py-4 text-greyText">
+                {blog.category}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {blog.category}
-                  </td>
+              <td className="py-4 text-greyText">
+                {blog.author || "Admin"}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {blog.author || "Admin"}
-                  </td>
+              <td className="py-4">
+                <StatusBadge status={blog.status} />
+              </td>
 
-                  <td className="py-4">
-                    <span className="rounded-full bg-[#F9E4E0] px-4 py-2 text-[12px] capitalize text-[#B76E79]">
-                      {blog.status}
-                    </span>
-                  </td>
+              <td className="flex flex-wrap gap-3 py-4">
+                <AdminButton
+                  text="Edit"
+                  variant="secondary"
+                  onClick={() => handleEdit(blog)}
+                />
 
-                  <td className="flex gap-3 py-4">
-                    <button
-                      onClick={() => handleEdit(blog)}
-                      className="font-semibold text-[#B76E79]"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => openDeleteModal(blog.id)}
-                      className="font-semibold text-[#800020]"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                <AdminButton
+                  text="Delete"
+                  variant="danger"
+                  onClick={() => openDeleteModal(blog.id)}
+                />
+              </td>
+            </tr>
+          ))}
+        </AdminTable>
       )}
 
       <ConfirmDeleteModal

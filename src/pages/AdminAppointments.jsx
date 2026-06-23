@@ -6,11 +6,17 @@ import {
   deleteAppointment,
 } from "../services/firebase/appointmentService";
 
+import { showSuccess, showError } from "../utils/toast";
+
 import AdminPageHeader from "../components/admin/AdminPageHeader";
 import AdminButton from "../components/admin/AdminButton";
+import AdminInput from "../components/admin/AdminInput";
+import AdminSelect from "../components/admin/AdminSelect";
+import AdminTable from "../components/admin/AdminTable";
 import Loader from "../components/admin/Loader";
 import EmptyState from "../components/admin/EmptyState";
 import ConfirmDeleteModal from "../components/admin/ConfirmDeleteModal";
+import StatusBadge from "../components/admin/StatusBadge";
 
 const initialFormData = {
   customerName: "",
@@ -38,6 +44,7 @@ const AdminAppointments = () => {
       setAppointments(data);
     } catch (error) {
       console.error("Error fetching appointments:", error);
+      showError("Failed to load appointments.");
     } finally {
       setLoading(false);
     }
@@ -69,7 +76,7 @@ const AdminAppointments = () => {
       !formData.date ||
       !formData.time
     ) {
-      alert("Please fill all required appointment fields.");
+      showError("Please fill all required appointment fields.");
       return false;
     }
 
@@ -84,14 +91,17 @@ const AdminAppointments = () => {
     try {
       if (editingId) {
         await updateAppointment(editingId, formData);
+        showSuccess("Appointment updated successfully.");
       } else {
         await addAppointment(formData);
+        showSuccess("Appointment added successfully.");
       }
 
+      await fetchAppointments();
       resetForm();
-      fetchAppointments();
     } catch (error) {
       console.error("Error saving appointment:", error);
+      showError("Failed to save appointment.");
     }
   };
 
@@ -119,9 +129,11 @@ const AdminAppointments = () => {
   const handleDelete = async () => {
     try {
       await deleteAppointment(selectedAppointmentId);
-      fetchAppointments();
+      showSuccess("Appointment deleted successfully.");
+      await fetchAppointments();
     } catch (error) {
       console.error("Error deleting appointment:", error);
+      showError("Failed to delete appointment.");
     } finally {
       setDeleteModalOpen(false);
       setSelectedAppointmentId(null);
@@ -133,7 +145,7 @@ const AdminAppointments = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9E4E0] p-4 md:p-8">
+    <div className="min-h-screen bg-softPink p-4 md:p-6 lg:p-8">
       <AdminPageHeader
         title="Appointment Management"
         subtitle="Create, update, and manage client appointments."
@@ -141,70 +153,63 @@ const AdminAppointments = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 grid grid-cols-1 gap-4 rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-4"
+        className="mb-8 grid grid-cols-1 gap-4 rounded-[24px] border border-softPink bg-white p-5 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-4"
       >
-        <input
+        <AdminInput
           name="customerName"
           placeholder="Customer Name"
           value={formData.customerName}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="email"
           type="email"
           placeholder="Customer Email"
           value={formData.email}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="service"
           placeholder="Service"
           value={formData.service}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="staff"
           placeholder="Staff"
           value={formData.staff}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="date"
           type="date"
           value={formData.date}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="time"
           type="time"
           value={formData.time}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <select
+        <AdminSelect
           name="status"
           value={formData.status}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         >
           <option value="pending">Pending</option>
           <option value="confirmed">Confirmed</option>
           <option value="completed">Completed</option>
           <option value="cancelled">Cancelled</option>
-        </select>
+        </AdminSelect>
 
-        <div className="flex gap-3 lg:col-span-4">
+        <div className="flex flex-wrap gap-3 md:col-span-2 lg:col-span-4">
           <AdminButton
             type="submit"
             text={editingId ? "Update Appointment" : "Add Appointment"}
@@ -227,74 +232,67 @@ const AdminAppointments = () => {
           message="No client appointments have been added yet."
         />
       ) : (
-        <div className="overflow-x-auto rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)]">
-          <table className="w-full font-['Montserrat'] text-[14px]">
-            <thead>
-              <tr className="border-b text-left text-[#9CA3AF]">
-                <th className="pb-4">Customer</th>
-                <th className="pb-4">Email</th>
-                <th className="pb-4">Service</th>
-                <th className="pb-4">Staff</th>
-                <th className="pb-4">Date</th>
-                <th className="pb-4">Time</th>
-                <th className="pb-4">Status</th>
-                <th className="pb-4">Actions</th>
-              </tr>
-            </thead>
+        <AdminTable
+          headers={[
+            "Customer",
+            "Email",
+            "Service",
+            "Staff",
+            "Date",
+            "Time",
+            "Status",
+            "Actions",
+          ]}
+        >
+          {appointments.map((item) => (
+            <tr
+              key={item.id}
+              className="border-b border-softPink transition-colors hover:bg-softPink/30 last:border-none"
+            >
+              <td className="py-4 font-medium text-darkText">
+                {item.customerName}
+              </td>
 
-            <tbody>
-              {appointments.map((item) => (
-                <tr key={item.id} className="border-b last:border-none">
-                  <td className="py-4 font-medium text-[#1A1A1A]">
-                    {item.customerName}
-                  </td>
+              <td className="py-4 text-greyText">
+                {item.email}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {item.email}
-                  </td>
+              <td className="py-4 text-greyText">
+                {item.service}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {item.service}
-                  </td>
+              <td className="py-4 text-greyText">
+                {item.staff || "-"}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {item.staff || "-"}
-                  </td>
+              <td className="py-4 text-greyText">
+                {item.date}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {item.date}
-                  </td>
+              <td className="py-4 text-greyText">
+                {item.time}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {item.time}
-                  </td>
+              <td className="py-4">
+                <StatusBadge status={item.status} />
+              </td>
 
-                  <td className="py-4">
-                    <span className="rounded-full bg-[#F9E4E0] px-4 py-2 text-[12px] capitalize text-[#B76E79]">
-                      {item.status}
-                    </span>
-                  </td>
+              <td className="flex flex-wrap gap-3 py-4">
+                <AdminButton
+                  text="Edit"
+                  variant="secondary"
+                  onClick={() => handleEdit(item)}
+                />
 
-                  <td className="flex gap-3 py-4">
-                    <button
-                      onClick={() => handleEdit(item)}
-                      className="font-semibold text-[#B76E79]"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => openDeleteModal(item.id)}
-                      className="font-semibold text-[#800020]"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                <AdminButton
+                  text="Delete"
+                  variant="danger"
+                  onClick={() => openDeleteModal(item.id)}
+                />
+              </td>
+            </tr>
+          ))}
+        </AdminTable>
       )}
 
       <ConfirmDeleteModal

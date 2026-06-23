@@ -1,4 +1,5 @@
 import React from "react";
+import AdminButton from "./AdminButton";
 
 const AdminPageHeader = ({
   title,
@@ -7,16 +8,16 @@ const AdminPageHeader = ({
   onButtonClick,
 }) => {
   return (
-    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+    <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       
       {/* Left Side */}
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+        <h1 className="font-heading text-3xl md:text-4xl font-semibold text-darkText">
           {title}
         </h1>
 
         {subtitle && (
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="mt-2 font-body text-sm md:text-base text-greyText">
             {subtitle}
           </p>
         )}
@@ -24,23 +25,11 @@ const AdminPageHeader = ({
 
       {/* Right Side */}
       {buttonText && (
-        <button
+        <AdminButton
+          text={buttonText}
           onClick={onButtonClick}
-          className="
-            bg-indigo-600
-            hover:bg-indigo-700
-            text-white
-            px-5
-            py-2.5
-            rounded-lg
-            font-medium
-            transition-all
-            duration-300
-            shadow-md
-          "
-        >
-          {buttonText}
-        </button>
+          variant="primary"
+        />
       )}
     </div>
   );

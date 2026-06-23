@@ -5,19 +5,45 @@ const EmptyState = ({
   message = "There is nothing to display right now.",
 }) => {
   return (
-    <div className="flex min-h-[300px] items-center justify-center">
-      <div className="text-center bg-white p-8 rounded-2xl shadow-md max-w-md w-full">
-        
-        {/* Icon */}
-        <div className="text-5xl mb-4">📂</div>
+    <div className="flex min-h-[350px] items-center justify-center">
+      <div
+        className="
+          w-full max-w-md
+          rounded-[24px]
+          bg-white
+          p-10
+          text-center
+          shadow-[0_8px_20px_rgba(0,0,0,0.08)]
+          border border-softPink
+        "
+      >
+        {/* Elegant Icon */}
+        <div className="mb-5 text-5xl text-primaryPink">
+          ✨
+        </div>
 
         {/* Title */}
-        <h2 className="text-xl font-semibold text-gray-800">
+        <h2
+          className="
+            font-heading
+            text-2xl
+            font-semibold
+            text-darkText
+          "
+        >
           {title}
         </h2>
 
         {/* Message */}
-        <p className="text-gray-500 mt-2 text-sm">
+        <p
+          className="
+            mt-3
+            font-body
+            text-sm
+            leading-6
+            text-greyText
+          "
+        >
           {message}
         </p>
       </div>

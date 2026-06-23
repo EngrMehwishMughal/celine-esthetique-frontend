@@ -1,5 +1,3 @@
-import React from "react";
-
 const AdminButton = ({
   text,
   onClick,
@@ -8,11 +6,20 @@ const AdminButton = ({
   disabled = false,
 }) => {
   const styles = {
-    primary: "bg-indigo-600 hover:bg-indigo-700 text-white",
-    secondary: "bg-gray-200 hover:bg-gray-300 text-gray-800",
-    success: "bg-green-600 hover:bg-green-700 text-white",
-    danger: "bg-red-600 hover:bg-red-700 text-white",
-    warning: "bg-yellow-500 hover:bg-yellow-600 text-white",
+    primary:
+      "bg-primaryPink text-white hover:bg-pink-600",
+
+    secondary:
+      "bg-white border border-primaryPink text-primaryPink hover:bg-softPink",
+
+    success:
+      "bg-gold text-darkText hover:brightness-95",
+
+    danger:
+      "bg-danger text-white hover:bg-red-900",
+
+    warning:
+      "bg-softPink text-primaryPink hover:opacity-90",
   };
 
   return (
@@ -21,13 +28,19 @@ const AdminButton = ({
       onClick={onClick}
       disabled={disabled}
       className={`
-        px-4 py-2
-        rounded-lg
-        font-medium
-        transition-all duration-300
+        px-6 py-3
+        rounded-full
+        font-body
+        font-semibold
+        text-sm md:text-base
         shadow-sm
+        transition-all duration-300
+        hover:scale-[1.02]
+        focus:outline-none
+        focus:ring-2
+        focus:ring-primaryPink/40
         ${styles[variant]}
-        ${disabled ? "opacity-50 cursor-not-allowed" : ""}
+        ${disabled ? "opacity-50 cursor-not-allowed hover:scale-100" : ""}
       `}
     >
       {text}

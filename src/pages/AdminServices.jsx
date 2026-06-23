@@ -6,8 +6,12 @@ import {
   deleteService,
 } from "../services/firebase/serviceService";
 
+import { showSuccess, showError } from "../utils/toast";
+
 import AdminPageHeader from "../components/admin/AdminPageHeader";
 import AdminButton from "../components/admin/AdminButton";
+import AdminInput from "../components/admin/AdminInput";
+import AdminTable from "../components/admin/AdminTable";
 import Loader from "../components/admin/Loader";
 import EmptyState from "../components/admin/EmptyState";
 import ConfirmDeleteModal from "../components/admin/ConfirmDeleteModal";
@@ -35,6 +39,7 @@ const AdminServices = () => {
       setServices(data);
     } catch (error) {
       console.error("Error fetching services:", error);
+      showError("Failed to load services.");
     } finally {
       setLoading(false);
     }
@@ -58,30 +63,39 @@ const AdminServices = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const validateForm = () => {
     if (
       !formData.name ||
       !formData.category ||
       !formData.duration ||
       !formData.price
     ) {
-      alert("Please fill all fields.");
-      return;
+      showError("Please fill all service fields.");
+      return false;
     }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
 
     try {
       if (editingId) {
         await updateService(editingId, formData);
+        showSuccess("Service updated successfully.");
       } else {
         await addService(formData);
+        showSuccess("Service added successfully.");
       }
 
+      await fetchServices();
       resetForm();
-      fetchServices();
     } catch (error) {
       console.error("Error saving service:", error);
+      showError("Failed to save service.");
     }
   };
 
@@ -106,11 +120,13 @@ const AdminServices = () => {
   const handleDelete = async () => {
     try {
       await deleteService(selectedServiceId);
-      fetchServices();
+      setDeleteModalOpen(false);
+      showSuccess("Service deleted successfully.");
+      await fetchServices();
     } catch (error) {
       console.error("Error deleting service:", error);
+      showError("Failed to delete service.");
     } finally {
-      setDeleteModalOpen(false);
       setSelectedServiceId(null);
     }
   };
@@ -120,7 +136,7 @@ const AdminServices = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9E4E0] p-4 md:p-8">
+    <div className="min-h-screen bg-softPink p-4 md:p-6 lg:p-8">
       <AdminPageHeader
         title="Service Management"
         subtitle="Add, update, and delete Celine Esthétique services."
@@ -128,41 +144,37 @@ const AdminServices = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 grid grid-cols-1 gap-4 rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-4"
+        className="mb-8 grid grid-cols-1 gap-4 rounded-[24px] border border-softPink bg-white p-5 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-4"
       >
-        <input
+        <AdminInput
           name="name"
           placeholder="Service Name"
           value={formData.name}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="category"
           placeholder="Category"
           value={formData.category}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="duration"
           placeholder="Duration"
           value={formData.duration}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="price"
           placeholder="Price"
           value={formData.price}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <div className="flex gap-3 md:col-span-4">
+        <div className="flex flex-wrap gap-3 md:col-span-2 lg:col-span-4">
           <AdminButton
             type="submit"
             text={editingId ? "Update Service" : "Add Service"}
@@ -185,57 +197,46 @@ const AdminServices = () => {
           message="You haven’t added any services yet."
         />
       ) : (
-        <div className="overflow-x-auto rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)]">
-          <table className="w-full font-['Montserrat'] text-[14px]">
-            <thead>
-              <tr className="border-b text-left text-[#9CA3AF]">
-                <th className="pb-4">Service</th>
-                <th className="pb-4">Category</th>
-                <th className="pb-4">Duration</th>
-                <th className="pb-4">Price</th>
-                <th className="pb-4">Actions</th>
-              </tr>
-            </thead>
+        <AdminTable
+          headers={["Service", "Category", "Duration", "Price", "Actions"]}
+        >
+          {services.map((service) => (
+            <tr
+              key={service.id}
+              className="border-b border-softPink transition-colors hover:bg-softPink/30 last:border-none"
+            >
+              <td className="py-4 font-medium text-darkText">
+                {service.name}
+              </td>
 
-            <tbody>
-              {services.map((service) => (
-                <tr key={service.id} className="border-b last:border-none">
-                  <td className="py-4 font-medium text-[#1A1A1A]">
-                    {service.name}
-                  </td>
+              <td className="py-4 text-greyText">
+                {service.category}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {service.category}
-                  </td>
+              <td className="py-4 text-greyText">
+                {service.duration}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {service.duration}
-                  </td>
+              <td className="py-4 font-semibold text-gold">
+                {service.price}
+              </td>
 
-                  <td className="py-4 font-bold text-[#D4AF37]">
-                    {service.price}
-                  </td>
+              <td className="flex flex-wrap gap-3 py-4">
+                <AdminButton
+                  text="Edit"
+                  variant="secondary"
+                  onClick={() => handleEdit(service)}
+                />
 
-                  <td className="flex gap-3 py-4">
-                    <button
-                      onClick={() => handleEdit(service)}
-                      className="font-semibold text-[#B76E79]"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => openDeleteModal(service.id)}
-                      className="font-semibold text-[#800020]"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                <AdminButton
+                  text="Delete"
+                  variant="danger"
+                  onClick={() => openDeleteModal(service.id)}
+                />
+              </td>
+            </tr>
+          ))}
+        </AdminTable>
       )}
 
       <ConfirmDeleteModal

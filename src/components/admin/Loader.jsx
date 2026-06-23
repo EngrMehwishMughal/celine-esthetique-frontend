@@ -2,11 +2,25 @@ import React from "react";
 
 const Loader = ({ text = "Loading..." }) => {
   return (
-    <div className="flex min-h-[300px] items-center justify-center">
+    <div className="flex min-h-[350px] items-center justify-center">
       <div className="text-center">
-        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-indigo-600"></div>
+        
+        {/* Spinner */}
+        <div
+          className="
+            mx-auto
+            h-14
+            w-14
+            animate-spin
+            rounded-full
+            border-4
+            border-softPink
+            border-t-primaryPink
+          "
+        ></div>
 
-        <p className="mt-4 text-sm font-medium text-gray-500">
+        {/* Text */}
+        <p className="mt-5 font-body text-sm md:text-base text-greyText">
           {text}
         </p>
       </div>

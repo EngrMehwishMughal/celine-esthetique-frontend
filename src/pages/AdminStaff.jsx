@@ -6,11 +6,17 @@ import {
   deleteStaff,
 } from "../services/firebase/staffService";
 
+import { showSuccess, showError } from "../utils/toast";
+
 import AdminPageHeader from "../components/admin/AdminPageHeader";
 import AdminButton from "../components/admin/AdminButton";
+import AdminInput from "../components/admin/AdminInput";
+import AdminSelect from "../components/admin/AdminSelect";
+import AdminTable from "../components/admin/AdminTable";
 import Loader from "../components/admin/Loader";
 import EmptyState from "../components/admin/EmptyState";
 import ConfirmDeleteModal from "../components/admin/ConfirmDeleteModal";
+import StatusBadge from "../components/admin/StatusBadge";
 
 const initialFormData = {
   name: "",
@@ -35,7 +41,8 @@ const AdminStaff = () => {
       const data = await getStaff();
       setStaffList(data);
     } catch (error) {
-      console.error("Error fetching staff:", error);
+      console.error(error);
+      showError("Failed to load staff.");
     } finally {
       setLoading(false);
     }
@@ -61,7 +68,7 @@ const AdminStaff = () => {
 
   const validateForm = () => {
     if (!formData.name || !formData.role || !formData.services) {
-      alert("Please fill all required fields.");
+      showError("Please fill all required fields.");
       return false;
     }
     return true;
@@ -75,14 +82,17 @@ const AdminStaff = () => {
     try {
       if (editingId) {
         await updateStaff(editingId, formData);
+        showSuccess("Staff updated successfully.");
       } else {
         await addStaff(formData);
+        showSuccess("Staff added successfully.");
       }
 
       resetForm();
-      fetchStaff();
+      await fetchStaff();
     } catch (error) {
-      console.error("Error saving staff:", error);
+      console.error(error);
+      showError("Failed to save staff.");
     }
   };
 
@@ -108,9 +118,11 @@ const AdminStaff = () => {
   const handleDelete = async () => {
     try {
       await deleteStaff(selectedStaffId);
-      fetchStaff();
+      showSuccess("Staff deleted successfully.");
+      await fetchStaff();
     } catch (error) {
-      console.error("Error deleting staff:", error);
+      console.error(error);
+      showError("Failed to delete staff.");
     } finally {
       setDeleteModalOpen(false);
       setSelectedStaffId(null);
@@ -122,7 +134,7 @@ const AdminStaff = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9E4E0] p-4 md:p-8">
+    <div className="min-h-screen bg-softPink p-4 md:p-6 lg:p-8">
       <AdminPageHeader
         title="Staff Management"
         subtitle="Manage salon team and specialists."
@@ -130,52 +142,47 @@ const AdminStaff = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 grid grid-cols-1 gap-4 rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-5"
+        className="mb-8 grid grid-cols-1 gap-4 rounded-[24px] border border-softPink bg-white p-5 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-5"
       >
-        <input
+        <AdminInput
           name="name"
           placeholder="Staff Name"
           value={formData.name}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="role"
           placeholder="Role / Specialist"
           value={formData.role}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="services"
           placeholder="Services Offered"
           value={formData.services}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="phone"
           placeholder="Phone Number"
           value={formData.phone}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <select
+        <AdminSelect
           name="status"
           value={formData.status}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         >
           <option value="active">Active</option>
-          <option value="on leave">On Leave</option>
+          <option value="blocked">Blocked</option>
           <option value="inactive">Inactive</option>
-        </select>
+        </AdminSelect>
 
-        <div className="flex gap-3 lg:col-span-5">
+        <div className="flex flex-wrap gap-3 lg:col-span-5">
           <AdminButton
             type="submit"
             text={editingId ? "Update Staff" : "Add Staff"}
@@ -198,64 +205,57 @@ const AdminStaff = () => {
           message="You haven’t added any staff members yet."
         />
       ) : (
-        <div className="overflow-x-auto rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)]">
-          <table className="w-full font-['Montserrat'] text-[14px]">
-            <thead>
-              <tr className="border-b text-left text-[#9CA3AF]">
-                <th className="pb-4">Name</th>
-                <th className="pb-4">Role</th>
-                <th className="pb-4">Services</th>
-                <th className="pb-4">Phone</th>
-                <th className="pb-4">Status</th>
-                <th className="pb-4">Actions</th>
-              </tr>
-            </thead>
+        <AdminTable
+          headers={[
+            "Name",
+            "Role",
+            "Services",
+            "Phone",
+            "Status",
+            "Actions",
+          ]}
+        >
+          {staffList.map((staff) => (
+            <tr
+              key={staff.id}
+              className="border-b border-softPink hover:bg-softPink/30 last:border-none"
+            >
+              <td className="py-4 font-medium text-darkText">
+                {staff.name}
+              </td>
 
-            <tbody>
-              {staffList.map((staff) => (
-                <tr key={staff.id} className="border-b last:border-none">
-                  <td className="py-4 font-medium text-[#1A1A1A]">
-                    {staff.name}
-                  </td>
+              <td className="py-4 text-greyText">
+                {staff.role}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {staff.role}
-                  </td>
+              <td className="py-4 text-greyText">
+                {staff.services}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {staff.services}
-                  </td>
+              <td className="py-4 text-greyText">
+                {staff.phone || "-"}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {staff.phone || "-"}
-                  </td>
+              <td className="py-4">
+                <StatusBadge status={staff.status} />
+              </td>
 
-                  <td className="py-4">
-                    <span className="rounded-full bg-[#F9E4E0] px-4 py-2 text-[12px] capitalize text-[#B76E79]">
-                      {staff.status}
-                    </span>
-                  </td>
+              <td className="flex flex-wrap gap-3 py-4">
+                <AdminButton
+                  text="Edit"
+                  variant="secondary"
+                  onClick={() => handleEdit(staff)}
+                />
 
-                  <td className="flex gap-3 py-4">
-                    <button
-                      onClick={() => handleEdit(staff)}
-                      className="font-semibold text-[#B76E79]"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => openDeleteModal(staff.id)}
-                      className="font-semibold text-[#800020]"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                <AdminButton
+                  text="Delete"
+                  variant="danger"
+                  onClick={() => openDeleteModal(staff.id)}
+                />
+              </td>
+            </tr>
+          ))}
+        </AdminTable>
       )}
 
       <ConfirmDeleteModal

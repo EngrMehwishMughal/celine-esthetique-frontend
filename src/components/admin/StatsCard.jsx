@@ -1,14 +1,30 @@
+import React from "react";
+
 const StatsCard = ({ title, value }) => {
-    return (
-      <div className="bg-white rounded-[20px] p-5 shadow-[0_8px_20px_rgba(0,0,0,0.08)]">
-        <p className="font-['Montserrat'] text-[14px] text-[#9CA3AF]">
-          {title}
-        </p>
-        <h2 className="font-['Playfair_Display'] text-[30px] text-[#D4AF37] mt-2">
-          {value}
-        </h2>
-      </div>
-    );
-  };
-  
-  export default StatsCard;
+  return (
+    <div
+      className="
+        rounded-[24px]
+        bg-white
+        p-6
+        border border-softPink
+        shadow-[0_8px_20px_rgba(0,0,0,0.08)]
+        transition-all duration-300
+        hover:-translate-y-1
+        hover:shadow-[0_12px_28px_rgba(0,0,0,0.12)]
+      "
+    >
+      {/* Title */}
+      <p className="font-body text-sm text-greyText">
+        {title}
+      </p>
+
+      {/* Value */}
+      <h2 className="mt-3 font-heading text-3xl md:text-4xl font-semibold text-gold">
+        {value}
+      </h2>
+    </div>
+  );
+};
+
+export default StatsCard;

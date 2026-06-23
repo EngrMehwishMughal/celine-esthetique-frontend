@@ -6,11 +6,17 @@ import {
   deleteAvailability,
 } from "../services/firebase/availabilityService";
 
+import { showSuccess, showError } from "../utils/toast";
+
 import AdminPageHeader from "../components/admin/AdminPageHeader";
 import AdminButton from "../components/admin/AdminButton";
+import AdminInput from "../components/admin/AdminInput";
+import AdminSelect from "../components/admin/AdminSelect";
+import AdminTable from "../components/admin/AdminTable";
 import Loader from "../components/admin/Loader";
 import EmptyState from "../components/admin/EmptyState";
 import ConfirmDeleteModal from "../components/admin/ConfirmDeleteModal";
+import StatusBadge from "../components/admin/StatusBadge";
 
 const initialFormData = {
   day: "",
@@ -36,6 +42,7 @@ const AdminAvailability = () => {
       setAvailabilityList(data);
     } catch (error) {
       console.error("Error fetching availability:", error);
+      showError("Failed to load availability settings.");
     } finally {
       setLoading(false);
     }
@@ -61,12 +68,12 @@ const AdminAvailability = () => {
 
   const validateForm = () => {
     if (!formData.day || !formData.startTime || !formData.endTime) {
-      alert("Please select day, start time, and end time.");
+      showError("Please select day, start time, and end time.");
       return false;
     }
 
     if (formData.startTime >= formData.endTime) {
-      alert("End time must be greater than start time.");
+      showError("End time must be greater than start time.");
       return false;
     }
 
@@ -81,14 +88,17 @@ const AdminAvailability = () => {
     try {
       if (editingId) {
         await updateAvailability(editingId, formData);
+        showSuccess("Availability updated successfully.");
       } else {
         await addAvailability(formData);
+        showSuccess("Availability added successfully.");
       }
 
+      await fetchAvailability();
       resetForm();
-      fetchAvailability();
     } catch (error) {
       console.error("Error saving availability:", error);
+      showError("Failed to save availability.");
     }
   };
 
@@ -114,9 +124,11 @@ const AdminAvailability = () => {
   const handleDelete = async () => {
     try {
       await deleteAvailability(selectedAvailabilityId);
-      fetchAvailability();
+      showSuccess("Availability deleted successfully.");
+      await fetchAvailability();
     } catch (error) {
       console.error("Error deleting availability:", error);
+      showError("Failed to delete availability.");
     } finally {
       setDeleteModalOpen(false);
       setSelectedAvailabilityId(null);
@@ -128,7 +140,7 @@ const AdminAvailability = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9E4E0] p-4 md:p-8">
+    <div className="min-h-screen bg-softPink p-4 md:p-6 lg:p-8">
       <AdminPageHeader
         title="Availability Settings"
         subtitle="Set salon opening hours, breaks, holidays, and closed days."
@@ -136,13 +148,12 @@ const AdminAvailability = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 grid grid-cols-1 gap-4 rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-5"
+        className="mb-8 grid grid-cols-1 gap-4 rounded-[24px] border border-softPink bg-white p-5 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-5"
       >
-        <select
+        <AdminSelect
           name="day"
           value={formData.day}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         >
           <option value="">Select Day</option>
           <option value="Monday">Monday</option>
@@ -152,45 +163,41 @@ const AdminAvailability = () => {
           <option value="Friday">Friday</option>
           <option value="Saturday">Saturday</option>
           <option value="Sunday">Sunday</option>
-        </select>
+        </AdminSelect>
 
-        <input
+        <AdminInput
           name="startTime"
           type="time"
           value={formData.startTime}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="endTime"
           type="time"
           value={formData.endTime}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <select
+        <AdminSelect
           name="status"
           value={formData.status}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         >
           <option value="open">Open</option>
           <option value="closed">Closed</option>
           <option value="break">Break</option>
           <option value="holiday">Holiday</option>
-        </select>
+        </AdminSelect>
 
-        <input
+        <AdminInput
           name="note"
           placeholder="Note"
           value={formData.note}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <div className="flex gap-3 lg:col-span-5">
+        <div className="flex flex-wrap gap-3 md:col-span-2 lg:col-span-5">
           <AdminButton
             type="submit"
             text={editingId ? "Update Availability" : "Add Availability"}
@@ -213,64 +220,50 @@ const AdminAvailability = () => {
           message="You haven’t added any availability settings yet."
         />
       ) : (
-        <div className="overflow-x-auto rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)]">
-          <table className="w-full font-['Montserrat'] text-[14px]">
-            <thead>
-              <tr className="border-b text-left text-[#9CA3AF]">
-                <th className="pb-4">Day</th>
-                <th className="pb-4">Start Time</th>
-                <th className="pb-4">End Time</th>
-                <th className="pb-4">Status</th>
-                <th className="pb-4">Note</th>
-                <th className="pb-4">Actions</th>
-              </tr>
-            </thead>
+        <AdminTable
+          headers={["Day", "Start Time", "End Time", "Status", "Note", "Actions"]}
+        >
+          {availabilityList.map((item) => (
+            <tr
+              key={item.id}
+              className="border-b border-softPink transition-colors hover:bg-softPink/30 last:border-none"
+            >
+              <td className="py-4 font-medium text-darkText">
+                {item.day}
+              </td>
 
-            <tbody>
-              {availabilityList.map((item) => (
-                <tr key={item.id} className="border-b last:border-none">
-                  <td className="py-4 font-medium text-[#1A1A1A]">
-                    {item.day}
-                  </td>
+              <td className="py-4 text-greyText">
+                {item.startTime}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {item.startTime}
-                  </td>
+              <td className="py-4 text-greyText">
+                {item.endTime}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {item.endTime}
-                  </td>
+              <td className="py-4">
+                <StatusBadge status={item.status} />
+              </td>
 
-                  <td className="py-4">
-                    <span className="rounded-full bg-[#F9E4E0] px-4 py-2 text-[12px] capitalize text-[#B76E79]">
-                      {item.status}
-                    </span>
-                  </td>
+              <td className="py-4 text-greyText">
+                {item.note || "-"}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {item.note || "-"}
-                  </td>
+              <td className="flex flex-wrap gap-3 py-4">
+                <AdminButton
+                  text="Edit"
+                  variant="secondary"
+                  onClick={() => handleEdit(item)}
+                />
 
-                  <td className="flex gap-3 py-4">
-                    <button
-                      onClick={() => handleEdit(item)}
-                      className="font-semibold text-[#B76E79]"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => openDeleteModal(item.id)}
-                      className="font-semibold text-[#800020]"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                <AdminButton
+                  text="Delete"
+                  variant="danger"
+                  onClick={() => openDeleteModal(item.id)}
+                />
+              </td>
+            </tr>
+          ))}
+        </AdminTable>
       )}
 
       <ConfirmDeleteModal

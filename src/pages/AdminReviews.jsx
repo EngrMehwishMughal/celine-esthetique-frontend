@@ -6,11 +6,17 @@ import {
   deleteReview,
 } from "../services/firebase/reviewService";
 
+import { showSuccess, showError } from "../utils/toast";
+
 import AdminPageHeader from "../components/admin/AdminPageHeader";
 import AdminButton from "../components/admin/AdminButton";
+import AdminInput from "../components/admin/AdminInput";
+import AdminSelect from "../components/admin/AdminSelect";
+import AdminTable from "../components/admin/AdminTable";
 import Loader from "../components/admin/Loader";
 import EmptyState from "../components/admin/EmptyState";
 import ConfirmDeleteModal from "../components/admin/ConfirmDeleteModal";
+import StatusBadge from "../components/admin/StatusBadge";
 
 const initialFormData = {
   client: "",
@@ -36,6 +42,7 @@ const AdminReviews = () => {
       setReviews(data);
     } catch (error) {
       console.error("Error fetching reviews:", error);
+      showError("Failed to load reviews.");
     } finally {
       setLoading(false);
     }
@@ -61,7 +68,7 @@ const AdminReviews = () => {
 
   const validateForm = () => {
     if (!formData.client || !formData.service || !formData.comment) {
-      alert("Please fill client name, service, and review comment.");
+      showError("Please fill client name, service, and review comment.");
       return false;
     }
 
@@ -76,14 +83,17 @@ const AdminReviews = () => {
     try {
       if (editingId) {
         await updateReview(editingId, formData);
+        showSuccess("Review updated successfully.");
       } else {
         await addReview(formData);
+        showSuccess("Review added successfully.");
       }
 
+      await fetchReviews();
       resetForm();
-      fetchReviews();
     } catch (error) {
       console.error("Error saving review:", error);
+      showError("Failed to save review.");
     }
   };
 
@@ -109,9 +119,11 @@ const AdminReviews = () => {
   const handleDelete = async () => {
     try {
       await deleteReview(selectedReviewId);
-      fetchReviews();
+      showSuccess("Review deleted successfully.");
+      await fetchReviews();
     } catch (error) {
       console.error("Error deleting review:", error);
+      showError("Failed to delete review.");
     } finally {
       setDeleteModalOpen(false);
       setSelectedReviewId(null);
@@ -123,7 +135,7 @@ const AdminReviews = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9E4E0] p-4 md:p-8">
+    <div className="min-h-screen bg-softPink p-4 md:p-6 lg:p-8">
       <AdminPageHeader
         title="Review Management"
         subtitle="Manage client feedback and review approval status."
@@ -131,47 +143,43 @@ const AdminReviews = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="mb-8 grid grid-cols-1 gap-4 rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-5"
+        className="mb-8 grid grid-cols-1 gap-4 rounded-[24px] border border-softPink bg-white p-5 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:grid-cols-2 lg:grid-cols-4"
       >
-        <input
+        <AdminInput
           name="client"
           placeholder="Client Name"
           value={formData.client}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <input
+        <AdminInput
           name="service"
           placeholder="Service"
           value={formData.service}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         />
 
-        <select
+        <AdminSelect
           name="rating"
           value={formData.rating}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         >
           <option value="5">5 Stars</option>
           <option value="4">4 Stars</option>
           <option value="3">3 Stars</option>
           <option value="2">2 Stars</option>
           <option value="1">1 Star</option>
-        </select>
+        </AdminSelect>
 
-        <select
+        <AdminSelect
           name="status"
           value={formData.status}
           onChange={handleChange}
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37]"
         >
           <option value="pending">Pending</option>
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
-        </select>
+        </AdminSelect>
 
         <textarea
           name="comment"
@@ -179,10 +187,10 @@ const AdminReviews = () => {
           value={formData.comment}
           onChange={handleChange}
           rows="3"
-          className="rounded-[12px] border border-[#F9E4E0] px-4 py-3 outline-none focus:border-[#D4AF37] lg:col-span-5"
+          className="w-full rounded-[14px] border border-softPink bg-white px-4 py-3 font-body text-darkText outline-none transition-all duration-300 focus:border-primaryPink focus:ring-2 focus:ring-softPink md:col-span-2 lg:col-span-4"
         />
 
-        <div className="flex gap-3 lg:col-span-5">
+        <div className="flex flex-wrap gap-3 md:col-span-2 lg:col-span-4">
           <AdminButton
             type="submit"
             text={editingId ? "Update Review" : "Add Review"}
@@ -205,64 +213,50 @@ const AdminReviews = () => {
           message="No client reviews have been added yet."
         />
       ) : (
-        <div className="overflow-x-auto rounded-[20px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)]">
-          <table className="w-full font-['Montserrat'] text-[14px]">
-            <thead>
-              <tr className="border-b text-left text-[#9CA3AF]">
-                <th className="pb-4">Client</th>
-                <th className="pb-4">Service</th>
-                <th className="pb-4">Rating</th>
-                <th className="pb-4">Comment</th>
-                <th className="pb-4">Status</th>
-                <th className="pb-4">Actions</th>
-              </tr>
-            </thead>
+        <AdminTable
+          headers={["Client", "Service", "Rating", "Comment", "Status", "Actions"]}
+        >
+          {reviews.map((review) => (
+            <tr
+              key={review.id}
+              className="border-b border-softPink transition-colors hover:bg-softPink/30 last:border-none"
+            >
+              <td className="py-4 font-medium text-darkText">
+                {review.client}
+              </td>
 
-            <tbody>
-              {reviews.map((review) => (
-                <tr key={review.id} className="border-b last:border-none">
-                  <td className="py-4 font-medium text-[#1A1A1A]">
-                    {review.client}
-                  </td>
+              <td className="py-4 text-greyText">
+                {review.service}
+              </td>
 
-                  <td className="py-4 text-[#9CA3AF]">
-                    {review.service}
-                  </td>
+              <td className="py-4 font-semibold text-gold">
+                {"★".repeat(Number(review.rating))}
+              </td>
 
-                  <td className="py-4 font-bold text-[#D4AF37]">
-                    {"★".repeat(Number(review.rating))}
-                  </td>
+              <td className="max-w-[320px] py-4 text-greyText">
+                {review.comment}
+              </td>
 
-                  <td className="max-w-[320px] py-4 text-[#9CA3AF]">
-                    {review.comment}
-                  </td>
+              <td className="py-4">
+                <StatusBadge status={review.status} />
+              </td>
 
-                  <td className="py-4">
-                    <span className="rounded-full bg-[#F9E4E0] px-4 py-2 text-[12px] capitalize text-[#B76E79]">
-                      {review.status}
-                    </span>
-                  </td>
+              <td className="flex flex-wrap gap-3 py-4">
+                <AdminButton
+                  text="Edit"
+                  variant="secondary"
+                  onClick={() => handleEdit(review)}
+                />
 
-                  <td className="flex gap-3 py-4">
-                    <button
-                      onClick={() => handleEdit(review)}
-                      className="font-semibold text-[#B76E79]"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => openDeleteModal(review.id)}
-                      className="font-semibold text-[#800020]"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                <AdminButton
+                  text="Delete"
+                  variant="danger"
+                  onClick={() => openDeleteModal(review.id)}
+                />
+              </td>
+            </tr>
+          ))}
+        </AdminTable>
       )}
 
       <ConfirmDeleteModal

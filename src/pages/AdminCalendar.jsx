@@ -9,6 +9,11 @@ import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 
 import { getAppointments } from "../services/firebase/appointmentService";
+import { showError, showInfo } from "../utils/toast";
+
+import AdminPageHeader from "../components/admin/AdminPageHeader";
+import Loader from "../components/admin/Loader";
+import EmptyState from "../components/admin/EmptyState";
 
 const locales = {
   "en-US": enUS,
@@ -24,44 +29,101 @@ const localizer = dateFnsLocalizer({
 
 const AdminCalendar = () => {
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAppointments = async () => {
+    try {
+      setLoading(true);
+
+      const appointments = await getAppointments();
+
+      const formattedEvents = appointments
+        .filter((item) => item.date && item.time)
+        .map((item) => {
+          const startDate = new Date(`${item.date}T${item.time}`);
+          const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+
+          return {
+            title: `${item.customerName} - ${item.service}`,
+            start: startDate,
+            end: endDate,
+            staff: item.staff,
+            status: item.status,
+            email: item.email,
+          };
+        });
+
+      setEvents(formattedEvents);
+    } catch (error) {
+      console.error("Error loading appointments:", error);
+      showError("Failed to load booking calendar.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchAppointments();
   }, []);
 
-  const fetchAppointments = async () => {
-    const appointments = await getAppointments();
-
-    const formattedEvents = appointments.map((item) => {
-      // combine date + time
-      const startDate = new Date(`${item.date}T${item.time}`);
-      const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
-
-      return {
-        title: `${item.customerName} - ${item.service}`,
-        start: startDate,
-        end: endDate,
-      };
-    });
-
-    setEvents(formattedEvents);
+  const handleSelectEvent = (event) => {
+    showInfo(
+      `Customer: ${event.title} | Staff: ${event.staff || "-"} | Status: ${
+        event.status || "-"
+      }`
+    );
   };
 
-  return (
-    <div className="min-h-screen bg-[#F9E4E0] p-8">
-      <h1 className="font-['Playfair_Display'] text-[36px] text-[#1A1A1A] mb-8">
-        Booking Calendar
-      </h1>
+  const eventStyleGetter = (event) => {
+    const statusColors = {
+      pending: "#F59E0B",
+      confirmed: "#E83E8C",
+      completed: "#87A96B",
+      cancelled: "#800020",
+    };
 
-      <div className="bg-white rounded-[20px] p-6 h-[700px] shadow-[0_8px_20px_rgba(0,0,0,0.08)]">
-        <Calendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: "100%" }}
+    return {
+      style: {
+        backgroundColor: statusColors[event.status] || "#D4AF37",
+        borderRadius: "10px",
+        border: "none",
+        padding: "4px 8px",
+        fontFamily: "Poppins, sans-serif",
+        fontSize: "13px",
+      },
+    };
+  };
+
+  if (loading) {
+    return <Loader text="Loading calendar..." />;
+  }
+
+  return (
+    <div className="min-h-screen bg-softPink p-4 md:p-6 lg:p-8">
+      <AdminPageHeader
+        title="Booking Calendar"
+        subtitle="View all customer bookings and appointments."
+      />
+
+      {events.length === 0 ? (
+        <EmptyState
+          title="No Bookings Found"
+          message="No appointments are available in the calendar yet."
         />
-      </div>
+      ) : (
+        <div className="h-[650px] overflow-hidden rounded-[24px] border border-softPink bg-white p-4 shadow-[0_8px_20px_rgba(0,0,0,0.08)] md:h-[750px] md:p-6">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            selectable
+            onSelectEvent={handleSelectEvent}
+            eventPropGetter={eventStyleGetter}
+            style={{ height: "100%" }}
+          />
+        </div>
+      )}
     </div>
   );
 };

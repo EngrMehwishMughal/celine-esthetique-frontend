@@ -1,82 +1,178 @@
+import { useEffect, useState } from "react";
+import {
+  getUsers,
+  updateUser,
+  deleteUser,
+} from "../services/firebase/userService";
+
+import { showSuccess, showError } from "../utils/toast";
+
+import AdminPageHeader from "../components/admin/AdminPageHeader";
+import AdminButton from "../components/admin/AdminButton";
+import AdminTable from "../components/admin/AdminTable";
+import Loader from "../components/admin/Loader";
+import EmptyState from "../components/admin/EmptyState";
+import ConfirmDeleteModal from "../components/admin/ConfirmDeleteModal";
+import StatusBadge from "../components/admin/StatusBadge";
+
 const AdminUsers = () => {
-    const users = [
-      {
-        name: "Sophie Martin",
-        email: "sophie@example.com",
-        phone: "+41 78 111 22 33",
-        role: "Client",
-        status: "Active",
-      },
-      {
-        name: "Emma Laurent",
-        email: "emma@example.com",
-        phone: "+41 78 444 55 66",
-        role: "Client",
-        status: "Active",
-      },
-      {
-        name: "Amina Khan",
-        email: "amina@example.com",
-        phone: "+41 78 777 88 99",
-        role: "Client",
-        status: "Blocked",
-      },
-    ];
-  
-    return (
-      <div className="min-h-screen bg-[#F9E4E0] p-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="font-['Playfair_Display'] text-[36px] text-[#1A1A1A]">
-            Client Management
-          </h1>
-  
-          <button className="bg-[#D4AF37] text-[#1A1A1A] px-7 py-3 rounded-full font-['Montserrat'] text-[14px] font-semibold">
-            Add Client
-          </button>
-        </div>
-  
-        <div className="bg-white rounded-[20px] p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)] overflow-x-auto">
-          <table className="w-full font-['Montserrat'] text-[14px]">
-            <thead>
-              <tr className="text-left text-[#9CA3AF] border-b">
-                <th className="pb-4">Name</th>
-                <th className="pb-4">Email</th>
-                <th className="pb-4">Phone</th>
-                <th className="pb-4">Role</th>
-                <th className="pb-4">Status</th>
-                <th className="pb-4">Actions</th>
-              </tr>
-            </thead>
-  
-            <tbody>
-              {users.map((user, index) => (
-                <tr key={index} className="border-b last:border-none">
-                  <td className="py-4 font-medium text-[#1A1A1A]">
-                    {user.name}
-                  </td>
-                  <td className="py-4 text-[#9CA3AF]">{user.email}</td>
-                  <td className="py-4 text-[#9CA3AF]">{user.phone}</td>
-                  <td className="py-4 text-[#9CA3AF]">{user.role}</td>
-                  <td className="py-4">
-                    <span className="bg-[#F9E4E0] text-[#B76E79] px-4 py-2 rounded-full text-[12px]">
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="py-4 flex gap-3">
-                    <button className="text-[#B76E79] font-semibold">
-                      View
-                    </button>
-                    <button className="text-[#800020] font-semibold">
-                      Block
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const data = await getUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      showError("Failed to load users.");
+    } finally {
+      setLoading(false);
+    }
   };
-  
-  export default AdminUsers;
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const toggleBlockUser = async (user) => {
+    const newStatus = user.status === "blocked" ? "active" : "blocked";
+
+    try {
+      await updateUser(user.id, {
+        status: newStatus,
+      });
+
+      showSuccess(
+        newStatus === "blocked"
+          ? "User blocked successfully."
+          : "User unblocked successfully."
+      );
+
+      await fetchUsers();
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      showError("Failed to update user status.");
+    }
+  };
+
+  const changeRole = async (user) => {
+    const newRole = user.role === "admin" ? "user" : "admin";
+
+    try {
+      await updateUser(user.id, {
+        role: newRole,
+      });
+
+      showSuccess("User role updated successfully.");
+      await fetchUsers();
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      showError("Failed to update user role.");
+    }
+  };
+
+  const openDeleteModal = (id) => {
+    setSelectedUserId(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteUser(selectedUserId);
+      showSuccess("User deleted successfully.");
+      await fetchUsers();
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      showError("Failed to delete user.");
+    } finally {
+      setDeleteModalOpen(false);
+      setSelectedUserId(null);
+    }
+  };
+
+  if (loading) {
+    return <Loader text="Loading users..." />;
+  }
+
+  return (
+    <div className="min-h-screen bg-softPink p-4 md:p-6 lg:p-8">
+      <AdminPageHeader
+        title="Client Management"
+        subtitle="Manage registered users and permissions."
+      />
+
+      {users.length === 0 ? (
+        <EmptyState
+          title="No Users Found"
+          message="No registered users yet."
+        />
+      ) : (
+        <AdminTable
+          headers={["Name", "Email", "Phone", "Role", "Status", "Actions"]}
+        >
+          {users.map((user) => (
+            <tr
+              key={user.id}
+              className="border-b border-softPink transition-colors hover:bg-softPink/30 last:border-none"
+            >
+              <td className="py-4 font-medium text-darkText">
+                {user.name || "-"}
+              </td>
+
+              <td className="py-4 text-greyText">
+                {user.email}
+              </td>
+
+              <td className="py-4 text-greyText">
+                {user.phone || "-"}
+              </td>
+
+              <td className="py-4 text-greyText capitalize">
+                {user.role || "user"}
+              </td>
+
+              <td className="py-4">
+                <StatusBadge status={user.status || "active"} />
+              </td>
+
+              <td className="flex flex-wrap gap-3 py-4">
+                <AdminButton
+                  text="Change Role"
+                  variant="secondary"
+                  onClick={() => changeRole(user)}
+                />
+
+                <AdminButton
+                  text={user.status === "blocked" ? "Unblock" : "Block"}
+                  variant="warning"
+                  onClick={() => toggleBlockUser(user)}
+                />
+
+                <AdminButton
+                  text="Delete"
+                  variant="danger"
+                  onClick={() => openDeleteModal(user.id)}
+                />
+              </td>
+            </tr>
+          ))}
+        </AdminTable>
+      )}
+
+      <ConfirmDeleteModal
+        isOpen={deleteModalOpen}
+        title="Delete User"
+        message="Are you sure you want to delete this user?"
+        onCancel={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+      />
+    </div>
+  );
+};
+
+export default AdminUsers;
