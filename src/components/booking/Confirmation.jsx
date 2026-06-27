@@ -6,7 +6,7 @@ const Confirmation = ({ booking, referenceId }) => {
   const { service, date, time, client } = booking;
 
   return (
-    <div className="text-center">
+    <div className="w-full max-w-[540px] mx-auto flex flex-col items-center text-center px-2 sm:px-4">
       <div className="w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-full bg-[#FFF5F8] flex items-center justify-center mx-auto mb-6">
         <FaCheckCircle className="text-[32px] sm:text-[36px] text-[#E1709A]" />
       </div>
@@ -19,13 +19,13 @@ const Confirmation = ({ booking, referenceId }) => {
         {client.email}
       </p>
 
-      <div className="max-w-[480px] mx-auto bg-white rounded-[20px] border border-[#F0F0F0] shadow-[0_4px_24px_rgba(0,0,0,0.06)] p-5 sm:p-7 text-left mb-8 sm:mb-10">
-        <p className="font-[Montserrat] text-[10px] font-bold uppercase tracking-wider text-[#E1709A] mb-4">
+      <div className="w-full bg-white rounded-[20px] border border-[#F0F0F0] shadow-[0_4px_24px_rgba(0,0,0,0.06)] px-7 py-7 sm:px-8 sm:py-8 md:px-9 md:py-9 text-left mb-8 sm:mb-10">
+        <p className="font-[Montserrat] text-[10px] font-bold uppercase tracking-wider text-[#E1709A] mb-5">
           Reference: {referenceId}
         </p>
 
-        <div className="space-y-4">
-          <div className="flex justify-between gap-4 pb-4 border-b border-[#F0F0F0]">
+        <div className="space-y-5">
+          <div className="flex justify-between gap-6 pb-5 border-b border-[#F0F0F0]">
             <span className="font-[Montserrat] text-[11px] uppercase tracking-wide text-[#888888] shrink-0">
               Service
             </span>
@@ -33,7 +33,7 @@ const Confirmation = ({ booking, referenceId }) => {
               {service.name}
             </span>
           </div>
-          <div className="flex justify-between gap-4 pb-4 border-b border-[#F0F0F0]">
+          <div className="flex justify-between gap-6 pb-5 border-b border-[#F0F0F0]">
             <span className="font-[Montserrat] text-[11px] uppercase tracking-wide text-[#888888] shrink-0">
               Date
             </span>
@@ -41,7 +41,7 @@ const Confirmation = ({ booking, referenceId }) => {
               {formatDisplayDate(date)}
             </span>
           </div>
-          <div className="flex justify-between gap-4 pb-4 border-b border-[#F0F0F0]">
+          <div className="flex justify-between gap-6 pb-5 border-b border-[#F0F0F0]">
             <span className="font-[Montserrat] text-[11px] uppercase tracking-wide text-[#888888] shrink-0">
               Time
             </span>
@@ -49,7 +49,7 @@ const Confirmation = ({ booking, referenceId }) => {
               {time}
             </span>
           </div>
-          <div className="flex justify-between gap-4 pb-4 border-b border-[#F0F0F0]">
+          <div className="flex justify-between gap-6 pb-5 border-b border-[#F0F0F0]">
             <span className="font-[Montserrat] text-[11px] uppercase tracking-wide text-[#888888] shrink-0">
               Duration
             </span>
@@ -57,7 +57,7 @@ const Confirmation = ({ booking, referenceId }) => {
               {service.duration} min
             </span>
           </div>
-          <div className="flex justify-between gap-4">
+          <div className="flex justify-between gap-6">
             <span className="font-[Montserrat] text-[11px] uppercase tracking-wide text-[#888888] shrink-0">
               Price
             </span>

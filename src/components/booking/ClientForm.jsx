@@ -31,21 +31,21 @@ const ClientForm = ({ formData, onChange, errors }) => {
   ];
 
   return (
-    <div>
-      <h2 className="font-[Great_Vibes] text-[32px] sm:text-[38px] text-[#1A1A1A] mb-2 text-center">
+    <div className="w-full max-w-[540px] mx-auto flex flex-col items-center px-2 sm:px-4">
+      <h2 className="font-[Great_Vibes] text-[32px] sm:text-[38px] text-[#1A1A1A] mb-3 text-center">
         Your Details
       </h2>
-      <p className="font-[Montserrat] text-[11px] sm:text-[12px] text-[#666666] text-center uppercase tracking-wide mb-8 sm:mb-10">
+      <p className="font-[Montserrat] text-[11px] sm:text-[12px] text-[#666666] text-center uppercase tracking-wide mb-8 sm:mb-10 px-2">
         We will send your confirmation to this contact
       </p>
 
-      <div className="max-w-[520px] mx-auto space-y-4 sm:space-y-5">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+      <div className="w-full space-y-6 sm:space-y-7">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
           {fields.slice(0, 2).map(({ id, label, type, placeholder, required }) => (
             <div key={id}>
               <label
                 htmlFor={id}
-                className="block font-[Montserrat] text-[11px] sm:text-[12px] font-semibold uppercase tracking-wide text-[#1A1A1A] mb-2"
+                className="block font-[Montserrat] text-[11px] sm:text-[12px] font-semibold uppercase tracking-wide text-[#1A1A1A] mb-2.5"
               >
                 {label} {required && <span className="text-[#E1709A]">*</span>}
               </label>
@@ -55,7 +55,7 @@ const ClientForm = ({ formData, onChange, errors }) => {
                 value={formData[id]}
                 onChange={(e) => onChange(id, e.target.value)}
                 placeholder={placeholder}
-                className={`w-full h-[46px] sm:h-[48px] px-4 rounded-[10px] border font-[Montserrat] text-[13px] text-[#1A1A1A] placeholder:text-[#BBBBBB] outline-none transition-colors ${
+                className={`w-full h-[48px] sm:h-[52px] px-6 rounded-[10px] border font-[Montserrat] text-[13px] text-[#1A1A1A] placeholder:text-[#BBBBBB] outline-none transition-colors ${
                   errors[id]
                     ? "border-red-400 focus:border-red-400"
                     : "border-[#E8E8E8] focus:border-[#E1709A]"
@@ -82,7 +82,7 @@ const ClientForm = ({ formData, onChange, errors }) => {
               value={formData[id]}
               onChange={(e) => onChange(id, e.target.value)}
               placeholder={placeholder}
-              className={`w-full h-[46px] sm:h-[48px] px-4 rounded-[10px] border font-[Montserrat] text-[13px] text-[#1A1A1A] placeholder:text-[#BBBBBB] outline-none transition-colors ${
+              className={`w-full h-[48px] sm:h-[52px] px-6 rounded-[10px] border font-[Montserrat] text-[13px] text-[#1A1A1A] placeholder:text-[#BBBBBB] outline-none transition-colors ${
                 errors[id]
                   ? "border-red-400 focus:border-red-400"
                   : "border-[#E8E8E8] focus:border-[#E1709A]"
@@ -107,7 +107,7 @@ const ClientForm = ({ formData, onChange, errors }) => {
             onChange={(e) => onChange("notes", e.target.value)}
             placeholder="Any allergies, preferences, or notes..."
             rows={4}
-            className="w-full px-4 py-3 rounded-[10px] border border-[#E8E8E8] font-[Montserrat] text-[13px] text-[#1A1A1A] placeholder:text-[#BBBBBB] outline-none focus:border-[#E1709A] transition-colors resize-none"
+            className="w-full px-6 py-4 sm:py-5 rounded-[10px] border border-[#E8E8E8] font-[Montserrat] text-[13px] text-[#1A1A1A] placeholder:text-[#BBBBBB] outline-none focus:border-[#E1709A] transition-colors resize-none"
           />
         </div>
       </div>

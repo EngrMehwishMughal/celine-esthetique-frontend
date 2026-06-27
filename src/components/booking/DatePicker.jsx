@@ -38,16 +38,16 @@ const DatePicker = ({ selectedDate, onSelect }) => {
     (viewYear === today.getFullYear() && viewMonth > today.getMonth());
 
   return (
-    <div>
-      <h2 className="font-[Great_Vibes] text-[32px] sm:text-[38px] text-[#1A1A1A] mb-2 text-center">
+    <div className="w-full max-w-[480px] mx-auto flex flex-col items-center px-2 sm:px-4">
+      <h2 className="font-[Great_Vibes] text-[32px] sm:text-[38px] text-[#1A1A1A] mb-3 text-center">
         Pick a Date
       </h2>
-      <p className="font-[Montserrat] text-[11px] sm:text-[12px] text-[#666666] text-center uppercase tracking-wide mb-8 sm:mb-10">
+      <p className="font-[Montserrat] text-[11px] sm:text-[12px] text-[#666666] text-center uppercase tracking-wide mb-8 sm:mb-10 px-2">
         We are closed on Sundays
       </p>
 
-      <div className="max-w-[420px] mx-auto bg-white rounded-[20px] border border-[#F0F0F0] shadow-[0_4px_24px_rgba(0,0,0,0.06)] p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-5">
+      <div className="w-full bg-white rounded-[20px] border border-[#F0F0F0] shadow-[0_4px_24px_rgba(0,0,0,0.06)] px-7 py-7 sm:px-8 sm:py-8 md:px-9 md:py-9">
+        <div className="flex items-center justify-between mb-6 px-1">
           <button
             type="button"
             onClick={goToPrevMonth}
@@ -70,7 +70,7 @@ const DatePicker = ({ selectedDate, onSelect }) => {
           </button>
         </div>
 
-        <div className="grid grid-cols-7 gap-1 mb-2">
+        <div className="grid grid-cols-7 gap-2.5 mb-3 px-0.5">
           {WEEKDAYS.map((day) => (
             <div
               key={day}
@@ -81,7 +81,7 @@ const DatePicker = ({ selectedDate, onSelect }) => {
           ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-2.5 px-0.5">
           {days.map((date, index) => {
             if (!date) {
               return <div key={`empty-${index}`} />;

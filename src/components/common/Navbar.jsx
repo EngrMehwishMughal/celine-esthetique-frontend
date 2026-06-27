@@ -56,7 +56,7 @@ const Navbar = () => {
           </div>
         </NavLink>
 
-        <div className="hidden lg:flex items-center gap-8 xl:gap-10 ml-auto shrink-0">
+        <div className="hidden lg:flex items-center gap-10 xl:gap-12 ml-auto shrink-0">
           <ul className="flex items-center gap-7 xl:gap-9">
             {navLinks.map(({ label, path }) => (
               <li key={path}>
@@ -66,8 +66,7 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
-
-          <div className="flex items-center gap-3 xl:gap-4">
+          <div className="flex items-center gap-5 xl:gap-6">
             <button
               type="button"
               className="w-10 h-10 rounded-full border border-white flex items-center justify-center text-white hover:bg-white/10 transition-colors shrink-0"
@@ -75,10 +74,9 @@ const Navbar = () => {
             >
               <FaShoppingCart className="text-[14px]" />
             </button>
-
             <Link
               to="/booking"
-              className="inline-flex items-center justify-center h-[40px] min-w-[168px] xl:min-w-[180px] px-6 xl:px-8 bg-white text-[#E1709A] rounded-[8px] text-[11px] xl:text-[12px] font-bold tracking-[0.07em] uppercase hover:bg-white/90 transition-colors whitespace-nowrap"
+              className="inline-flex items-center justify-center h-[40px] min-w-[140px] xl:min-w-[150px] px-5 xl:px-6 bg-white text-[#E1709A] rounded-[8px] text-[11px] xl:text-[12px] font-bold tracking-[0.07em] uppercase hover:bg-white/90 transition-colors whitespace-nowrap"
             >
               Online Booking
             </Link>

@@ -2,8 +2,8 @@ import { BOOKING_STEPS } from "../../data/bookingServices";
 
 const StepIndicator = ({ currentStep }) => {
   return (
-    <div className="w-full mb-8 sm:mb-10">
-      <div className="hidden sm:flex items-center justify-between gap-2">
+    <div className="w-full max-w-[720px] mx-auto mb-6 sm:mb-8 px-1">
+      <div className="hidden sm:flex items-center justify-between gap-3">
         {BOOKING_STEPS.map((step, index) => {
           const isActive = currentStep === step.id;
           const isComplete = currentStep > step.id;

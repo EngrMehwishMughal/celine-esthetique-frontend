@@ -111,21 +111,30 @@ const BookingPage = () => {
   return (
     <>
       <Header />
-      <main className="w-full bg-[#FAFAFA] min-h-[calc(100vh-120px)] py-8 sm:py-12 md:py-14">
-        <div className="w-full max-w-[1440px] mx-auto pl-8 sm:pl-10 md:pl-12 lg:pl-14 xl:pl-16 pr-5 sm:pr-6 md:pr-8 lg:pr-10 xl:pr-12">
-          <div className="max-w-[720px] mx-auto">
-            <div className="text-center mb-6 sm:mb-8">
-              <h1 className="font-[Great_Vibes] text-[36px] sm:text-[44px] md:text-[48px] text-[#E1709A] mb-2">
+      <main className="w-full bg-white min-h-[calc(100vh-120px)] font-[Montserrat] py-8 sm:py-10 md:py-12 lg:py-14">
+        <div className="w-full max-w-[1440px] mx-auto px-5 sm:px-8 md:px-10 lg:px-12 xl:px-14">
+          <div
+            className={`w-full mx-auto flex flex-col items-center ${
+              step === 1 ? "max-w-[920px]" : "max-w-[640px]"
+            }`}
+          >
+            <div className="w-full text-center mb-6 sm:mb-8 md:mb-10">
+              <h1 className="font-[Great_Vibes] text-[34px] sm:text-[42px] md:text-[48px] text-[#E1709A] mb-2 leading-tight">
                 Online Booking
               </h1>
-              <p className="font-[Montserrat] text-[11px] sm:text-[12px] text-[#666666] uppercase tracking-wide">
+              <p className="text-[10px] sm:text-[11px] md:text-[12px] text-[#666666] uppercase tracking-[0.12em] px-2">
                 Celine Esthétique — City Centre Lausanne
               </p>
             </div>
 
-            {step < 5 && <StepIndicator currentStep={step} />}
+            {step < 5 && (
+              <div className="w-full mb-6 sm:mb-8">
+                <StepIndicator currentStep={step} />
+              </div>
+            )}
 
-            <div className="bg-white rounded-[24px] shadow-[0_4px_32px_rgba(0,0,0,0.06)] p-5 sm:p-8 md:p-10 mb-6 sm:mb-8">
+            <div className="w-full rounded-[20px] sm:rounded-[24px] border border-[#F0F0F0] bg-white shadow-[0_2px_24px_rgba(0,0,0,0.04)] p-6 sm:p-8 md:p-10 lg:p-12">
+              <div className="w-full flex flex-col items-center">
               {step === 1 && (
                 <ServiceSelection selectedService={service} onSelect={handleServiceSelect} />
               )}
@@ -148,37 +157,38 @@ const BookingPage = () => {
                   referenceId={referenceId}
                 />
               )}
-            </div>
 
-            {step < 5 && (
-              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  disabled={step === 1}
-                  className="inline-flex items-center justify-center h-[46px] sm:h-[48px] px-6 rounded-[8px] border border-[#1A1A1A] text-[#1A1A1A] font-[Montserrat] text-[12px] font-bold tracking-[0.07em] uppercase hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Back
-                </button>
+              {step < 5 && (
+                <div className="w-full mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-[#F0F0F0] flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                  <button
+                    type="button"
+                    onClick={handleBack}
+                    disabled={step === 1}
+                    className="inline-flex items-center justify-center w-full sm:w-auto min-w-[140px] h-[48px] sm:h-[50px] px-8 sm:px-10 py-3 rounded-[8px] border border-[#1A1A1A] bg-white text-[#1A1A1A] text-[11px] sm:text-[12px] font-bold tracking-[0.07em] uppercase hover:bg-[#FAFAFA] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Back
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={
-                    !canContinue() ||
-                    isSubmitting ||
-                    (step === 3 && !hasAvailableSlots)
-                  }
-                  className="inline-flex items-center justify-center h-[46px] sm:h-[48px] min-w-[160px] px-8 rounded-[8px] bg-[#E85A8A] text-white font-[Montserrat] text-[12px] font-bold tracking-[0.07em] uppercase shadow-[0_3px_10px_rgba(232,90,138,0.34)] hover:bg-[#D85A87] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting
-                    ? "Confirming..."
-                    : step === 4
-                      ? "Confirm Booking"
-                      : "Continue"}
-                </button>
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    disabled={
+                      !canContinue() ||
+                      isSubmitting ||
+                      (step === 3 && !hasAvailableSlots)
+                    }
+                    className="inline-flex items-center justify-center w-full sm:w-auto min-w-[160px] h-[48px] sm:h-[50px] px-8 sm:px-10 py-3 rounded-[8px] bg-[#E85A8A] text-white text-[11px] sm:text-[12px] font-bold tracking-[0.07em] uppercase shadow-[0_3px_10px_rgba(232,90,138,0.34)] hover:bg-[#D85A87] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting
+                      ? "Confirming..."
+                      : step === 4
+                        ? "Confirm Booking"
+                        : "Continue"}
+                  </button>
+                </div>
+              )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </main>
