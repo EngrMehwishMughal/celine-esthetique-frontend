@@ -1,30 +1,46 @@
+/**
+ * Navbar — pink navigation bar with logo, menu links, and booking button.
+ * On mobile, links collapse into a hamburger menu.
+ */
+// React hook for tracking whether the mobile menu is open
 import { useState } from "react";
+// Router links that highlight the current page
 import { NavLink, Link } from "react-router-dom";
-import { FaShoppingCart, FaBars, FaTimes } from "react-icons/fa";
+// Icons for cart, menu toggle, and profile
+import { FaShoppingCart, FaBars, FaTimes, FaRegUser } from "react-icons/fa";
 
+// All main pages the user can navigate to
 const navLinks = [
   { label: "HOME", path: "/" },
   { label: "SERVICE", path: "/services" },
+  { label: "GALLERY", path: "/gallery" },
   { label: "ABOUT", path: "/about" },
   { label: "CONTACT", path: "/contact" },
+  { label: "USER DASHBOARD", path: "/dashboard" },
 ];
 
+// Styles the nav link — white + underline when you're on that page
 const linkClass = ({ isActive }) =>
   `text-[12px] lg:text-[13px] font-medium tracking-[0.08em] uppercase transition-colors ${
     isActive ? "text-white/90 underline underline-offset-4" : "text-white hover:text-white/80"
   }`;
 
+// Main site navigation bar component
 const Navbar = () => {
+  // true = mobile dropdown menu is visible
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <nav className="w-full bg-[#E1709A] relative z-50">
+      {/* Top row: logo, desktop links, and mobile menu button */}
       <div className="w-full max-w-[1440px] mx-auto pl-8 sm:pl-10 md:pl-12 lg:pl-14 xl:pl-16 pr-5 sm:pr-6 md:pr-8 lg:pr-10 xl:pr-12 py-3 md:py-4 flex justify-between items-center gap-4">
+        {/* Logo — clicking it goes home and closes the mobile menu */}
         <NavLink
           to="/"
           className="flex items-center gap-2 sm:gap-2.5 shrink-0"
           onClick={() => setMenuOpen(false)}
         >
+          {/* Circular icon placeholder for the brand mark */}
           <div className="flex w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full border border-white/50 items-center justify-center shrink-0">
             <svg
               viewBox="0 0 40 40"
@@ -46,6 +62,7 @@ const Navbar = () => {
               />
             </svg>
           </div>
+          {/* Salon name in script font */}
           <div className="leading-tight">
             <span className="block font-[Great_Vibes] text-[20px] sm:text-[24px] md:text-[28px] text-white whitespace-nowrap">
               Celine Ongles
@@ -56,7 +73,9 @@ const Navbar = () => {
           </div>
         </NavLink>
 
+        {/* Desktop navigation — hidden on small screens */}
         <div className="hidden lg:flex items-center gap-10 xl:gap-12 ml-auto shrink-0">
+          {/* Horizontal list of page links */}
           <ul className="flex items-center gap-7 xl:gap-9">
             {navLinks.map(({ label, path }) => (
               <li key={path}>
@@ -66,7 +85,15 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
+          {/* Profile, cart, and booking actions */}
           <div className="flex items-center gap-5 xl:gap-6">
+            <Link
+              to="/profile"
+              className="w-10 h-10 rounded-full border border-white flex items-center justify-center text-white hover:bg-white/10 transition-colors shrink-0"
+              aria-label="My profile"
+            >
+              <FaRegUser className="text-[14px]" />
+            </Link>
             <button
               type="button"
               className="w-10 h-10 rounded-full border border-white flex items-center justify-center text-white hover:bg-white/10 transition-colors shrink-0"
@@ -83,6 +110,7 @@ const Navbar = () => {
           </div>
         </div>
 
+        {/* Hamburger button — toggles mobile menu on small screens */}
         <button
           type="button"
           className="lg:hidden text-white text-[22px] p-1 shrink-0"
@@ -93,8 +121,10 @@ const Navbar = () => {
         </button>
       </div>
 
+      {/* Mobile dropdown menu — shown when menuOpen is true */}
       {menuOpen && (
         <div className="lg:hidden bg-[#E1709A] border-t border-white/20 pl-8 sm:pl-10 md:pl-12 pr-5 sm:pr-6 md:pr-8 py-5">
+          {/* Stacked page links */}
           <ul className="flex flex-col gap-4">
             {navLinks.map(({ label, path }) => (
               <li key={path}>
@@ -108,7 +138,16 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
+          {/* Mobile profile, cart, and booking buttons */}
           <div className="mt-5 flex flex-col gap-3">
+            <Link
+              to="/profile"
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center justify-center gap-2 w-full border border-white/50 text-white py-2.5 rounded-full text-[12px] font-medium tracking-wide uppercase"
+            >
+              <FaRegUser className="text-[13px]" />
+              My Profile
+            </Link>
             <button
               type="button"
               className="flex items-center justify-center gap-2 w-full border border-white/50 text-white py-2.5 rounded-full text-[12px] font-medium tracking-wide uppercase"
@@ -130,4 +169,5 @@ const Navbar = () => {
   );
 };
 
+// Export so Header and pages can use the navigation bar
 export default Navbar;

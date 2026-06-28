@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/*
+ * NOTE: Do not add an unlayered `* { margin:0; padding:0 }` reset here.
+ * Tailwind v4 ships these resets in its preflight (`@layer base`), and any
+ * unlayered rule overrides ALL layered utilities (px-*, py-*, mx-auto, mb-*),
+ * which silently breaks spacing across the entire app.
+ */
 
 :root {
   --primary-pink: #E1709A;
@@ -34,8 +35,4 @@ body,
 
 body {
   overflow-x: hidden;
-}
-
-p {
-  margin: 0;
 }
