@@ -1,32 +1,37 @@
 import { Routes, Route } from "react-router-dom";
-import HomePage from "../pages/HomePage";
-import Services from "../pages/Services";
-import About from "../pages/About";
-import Contact from "../pages/Contact";
-import AdminDashboard from "../pages/AdminDashboard";
-import AdminServices from "../pages/AdminServices";
-import AdminAppointments from "../pages/AdminAppointments";
-import AdminStaff from "../pages/AdminStaff";
-import AdminUsers from "../pages/AdminUsers";
-import AdminReviews from "../pages/AdminReviews";
-import AdminBlog from "../pages/AdminBlog";
-import AdminGallery from "../pages/AdminGallery";
-import AdminReports from "../pages/AdminReports";
-import AdminAvailability from "../pages/AdminAvailability";
-import AdminNotifications from "../pages/AdminNotifications";
-import AdminSettings from "../pages/AdminSettings";
-import AdminCoupons from "../pages/AdminCoupons";
-import Login from "../components/auth/Login";
-import Register from "../components/auth/Register";
-import ForgotPassword from "../components/auth/ForgotPassword";
-import AdminProtectedRoute from "../components/auth/AdminProtectedRoute";
-import AdminCalendar from "../pages/AdminCalendar";
-import AdminProducts from "../pages/AdminProducts";
+import HomePage from "@/pages/public/HomePage";
+import Services from "@/pages/public/Services";
+import About from "@/pages/public/About";
+import Contact from "@/pages/public/Contact";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminServices from "@/pages/admin/AdminServices";
+import AdminAppointments from "@/pages/admin/AdminAppointments";
+import AdminStaff from "@/pages/admin/AdminStaff";
+import AdminUsers from "@/pages/admin/AdminUsers";
+import AdminReviews from "@/pages/admin/AdminReviews";
+import AdminBlog from "@/pages/admin/AdminBlog";
+import AdminGallery from "@/pages/admin/AdminGallery";
+import AdminReports from "@/pages/admin/AdminReports";
+import AdminAvailability from "@/pages/admin/AdminAvailability";
+import AdminNotifications from "@/pages/admin/AdminNotifications";
+import AdminSettings from "@/pages/admin/AdminSettings";
+import AdminCoupons from "@/pages/admin/AdminCoupons";
+import Login from "@/components/auth/Login";
+import Register from "@/components/auth/Register";
+import ForgotPassword from "@/components/auth/ForgotPassword";
+import AdminProtectedRoute from "@/routes/AdminProtectedRoute";
+import AdminCalendar from "@/pages/admin/AdminCalendar";
+import AdminProducts from "@/pages/admin/AdminProducts";
+import ShopPage from "@/pages/public/ShopPage";
+import BlogPage from "@/pages/public/BlogPage";
+
 const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/services" element={<Services />} />
+      <Route path="/shop" element={<ShopPage />} />
+      <Route path="/blog" element={<BlogPage />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route

@@ -10,7 +10,7 @@ import {
     orderBy,
   } from "firebase/firestore";
   
-  import { db } from "./firebase";
+  import { db } from "@/services/firebase/firebaseConfig";
   
   const couponRef = collection(db, "coupons");
   

@@ -1,21 +1,28 @@
 const AdminTable = ({ headers, children }) => {
-    return (
-      <div className="overflow-x-auto rounded-[24px] bg-white p-6 shadow-[0_8px_20px_rgba(0,0,0,0.08)]">
-        <table className="w-full font-body text-sm">
-          <thead>
-            <tr className="border-b text-left text-greyText">
-              {headers.map((header, index) => (
-                <th key={index} className="pb-4">
+  return (
+    <div className="w-full min-w-0 overflow-hidden rounded-[22px] border border-[#F1E4E8] bg-white">
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[650px] border-collapse font-body text-sm">
+          <thead className="bg-[#FAF7F5]">
+            <tr>
+              {headers.map((header) => (
+                <th
+                  key={header}
+                  className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-[1.5px] text-greyText"
+                >
                   {header}
                 </th>
               ))}
             </tr>
           </thead>
-  
-          <tbody>{children}</tbody>
+
+          <tbody className="divide-y divide-[#F1E4E8]">
+            {children}
+          </tbody>
         </table>
       </div>
-    );
-  };
-  
-  export default AdminTable;
+    </div>
+  );
+};
+
+export default AdminTable;

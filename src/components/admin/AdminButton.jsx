@@ -6,20 +6,16 @@ const AdminButton = ({
   disabled = false,
 }) => {
   const styles = {
-    primary:
-      "bg-primaryPink text-white hover:bg-pink-600",
+    primary: "bg-primaryPink text-white hover:opacity-90",
 
     secondary:
-      "bg-white border border-primaryPink text-primaryPink hover:bg-softPink",
+      "border border-primaryPink bg-white text-primaryPink hover:bg-softPink",
 
-    success:
-      "bg-gold text-darkText hover:brightness-95",
+    success: "bg-gold text-darkText hover:brightness-95",
 
-    danger:
-      "bg-danger text-white hover:bg-red-900",
+    danger: "bg-danger text-white hover:opacity-90",
 
-    warning:
-      "bg-softPink text-primaryPink hover:opacity-90",
+    warning: "bg-softPink text-primaryPink hover:opacity-90",
   };
 
   return (
@@ -28,19 +24,21 @@ const AdminButton = ({
       onClick={onClick}
       disabled={disabled}
       className={`
-        px-6 py-3
         rounded-full
+        px-6 py-3
         font-body
-        font-semibold
         text-sm md:text-base
+        font-semibold
         shadow-sm
-        transition-all duration-300
-        hover:scale-[1.02]
         focus:outline-none
         focus:ring-2
         focus:ring-primaryPink/40
-        ${styles[variant]}
-        ${disabled ? "opacity-50 cursor-not-allowed hover:scale-100" : ""}
+        ${styles[variant] || styles.primary}
+        ${
+          disabled
+            ? "cursor-not-allowed opacity-50"
+            : "cursor-pointer transition-all duration-300 hover:scale-[1.02]"
+        }
       `}
     >
       {text}

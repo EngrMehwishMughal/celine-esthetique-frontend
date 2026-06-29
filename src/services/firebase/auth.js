@@ -4,8 +4,7 @@ import {
   sendPasswordResetEmail,
   signOut,
 } from "firebase/auth";
-
-import { auth } from "./firebase";
+import { auth } from "@/services/firebase/firebaseConfig";
 
 // Register
 export const registerUser = (email, password) => {

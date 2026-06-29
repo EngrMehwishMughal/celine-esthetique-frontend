@@ -1,5 +1,4 @@
-import React from "react";
-import AdminButton from "./AdminButton";
+import AdminButton from "@/components/admin/AdminButton";
 
 const ConfirmDeleteModal = ({
   isOpen,
@@ -26,17 +25,8 @@ const ConfirmDeleteModal = ({
         </p>
 
         <div className="mt-7 flex justify-end gap-3">
-          <AdminButton
-            text="Cancel"
-            variant="secondary"
-            onClick={onCancel}
-          />
-
-          <AdminButton
-            text="Delete"
-            variant="danger"
-            onClick={onConfirm}
-          />
+          <AdminButton text="Cancel" variant="secondary" onClick={onCancel} />
+          <AdminButton text="Delete" variant="danger" onClick={onConfirm} />
         </div>
       </div>
     </div>

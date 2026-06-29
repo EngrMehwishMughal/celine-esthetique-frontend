@@ -7,8 +7,8 @@ import {
     doc,
     serverTimestamp,
   } from "firebase/firestore";
-  
-  import db from "./firestore";
+   
+  import { db } from "@/services/firebase/firebaseConfig";
   
   const servicesRef = collection(db, "services");
   

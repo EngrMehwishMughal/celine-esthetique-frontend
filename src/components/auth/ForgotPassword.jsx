@@ -1,41 +1,79 @@
 import { useState } from "react";
-import { forgotPassword } from "../../services/firebase/auth";
+
+import { forgotPassword } from "@/services/firebase/auth";
+
+import AdminInput from "@/components/admin/AdminInput";
+import AdminButton from "@/components/admin/AdminButton";
+
+import { showSuccess, showError } from "@/utils/toast";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const validateForm = () => {
+    if (!email) {
+      showError("Please enter your email.");
+      return false;
+    }
+
+    return true;
+  };
 
   const handleReset = async (e) => {
     e.preventDefault();
 
+    if (!validateForm()) return;
+
     try {
+      setLoading(true);
+
       await forgotPassword(email);
-      alert("Password reset email sent");
+
+      showSuccess("Password reset email sent successfully.");
+      setEmail("");
     } catch (error) {
-      alert(error.message);
+      console.error("Password reset error:", error);
+      showError(error.message || "Failed to send reset email.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F9E4E0] flex items-center justify-center p-6">
+    <div className="flex min-h-screen items-center justify-center bg-softPink p-4">
       <form
         onSubmit={handleReset}
-        className="bg-white w-full max-w-[420px] rounded-[20px] p-8 shadow-[0_8px_20px_rgba(0,0,0,0.08)]"
+        className="w-full max-w-[420px] rounded-[24px] border border-softPink bg-white p-6 shadow-md md:p-8"
       >
-        <h1 className="font-['Playfair_Display'] text-[36px] text-[#1A1A1A] mb-6">
-          Forgot Password
-        </h1>
+        <div className="mb-6 text-center">
+          <h1 className="font-heading text-3xl font-semibold text-darkText md:text-4xl">
+            Forgot Password
+          </h1>
 
-        <input
-          type="email"
-          placeholder="Enter your email"
-          className="w-full border border-[#F9E4E0] rounded-[12px] px-4 py-3 mb-6"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          <p className="mt-2 font-body text-sm text-greyText">
+            Enter your email to receive a password reset link.
+          </p>
+        </div>
 
-        <button className="w-full bg-[#D4AF37] text-[#1A1A1A] px-7 py-3 rounded-full font-semibold">
-          Send Reset Link
-        </button>
+        <div className="space-y-4">
+          <AdminInput
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div className="mt-6">
+          <AdminButton
+            type="submit"
+            text={loading ? "Sending..." : "Send Reset Link"}
+            variant="primary"
+            disabled={loading}
+          />
+        </div>
       </form>
     </div>
   );

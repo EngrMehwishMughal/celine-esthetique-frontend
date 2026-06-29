@@ -8,7 +8,7 @@ import {
     serverTimestamp,
   } from "firebase/firestore";
   
-  import db from "./firestore";
+  import { db } from "@/services/firebase/firebaseConfig";
   
   const staffRef = collection(db, "staff");
   

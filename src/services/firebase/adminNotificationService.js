@@ -7,7 +7,7 @@ import {
     orderBy,
   } from "firebase/firestore";
   
-  import { db } from "./firebase";
+  import { db } from "@/services/firebase/firebaseConfig";
   
   const notificationsRef = collection(db, "notifications");
   

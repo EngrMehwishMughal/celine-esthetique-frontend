@@ -17,7 +17,7 @@ import {
     deleteObject,
   } from "firebase/storage";
   
-  import { db, storage } from "./firebase";
+  import { db, storage } from "@/services/firebase/firebaseConfig";
   
   const galleryRef = collection(db, "gallery");
   

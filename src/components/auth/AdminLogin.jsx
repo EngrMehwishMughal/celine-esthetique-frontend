@@ -1,48 +1,114 @@
 import { useState } from "react";
-import { loginUser } from "../../services/firebase/auth";
+import { useNavigate } from "react-router-dom";
+
+import { loginUser } from "@/services/firebase/auth";
+import { getUserProfile } from "@/services/firebase/firestore";
+
+import AdminButton from "@/components/admin/AdminButton";
+import AdminInput from "@/components/admin/AdminInput";
+
+import { showSuccess, showError } from "@/utils/toast";
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const validateForm = () => {
+    if (!formData.email || !formData.password) {
+      showError("Please enter email and password.");
+      return false;
+    }
+
+    return true;
+  };
 
   const handleAdminLogin = async (e) => {
     e.preventDefault();
 
-    try {
-      await loginUser(email, password);
+    if (!validateForm()) return;
 
-      // later check admin role from firestore
-      alert("Admin Login Successful");
+    try {
+      setLoading(true);
+
+      const userCredential = await loginUser(
+        formData.email,
+        formData.password
+      );
+
+      const profile = await getUserProfile(userCredential.user.uid);
+
+      if (profile?.role !== "admin") {
+        showError("Access denied. You are not an admin.");
+        return;
+      }
+
+      showSuccess("Admin login successful.");
+      navigate("/admin", { replace: true });
     } catch (error) {
-      alert(error.message);
+      console.error("Admin login error:", error);
+      showError(error.message || "Failed to login.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F9E4E0]">
+    <div className="flex min-h-screen items-center justify-center bg-softPink p-4">
       <form
         onSubmit={handleAdminLogin}
-        className="bg-white p-8 rounded-[20px] w-[420px]"
+        className="w-full max-w-[420px] rounded-[24px] border border-softPink bg-white p-6 shadow-md md:p-8"
       >
-        <h1 className="text-[36px] mb-6">Admin Login</h1>
+        <div className="mb-6 text-center">
+          <h1 className="font-heading text-3xl font-semibold text-darkText md:text-4xl">
+            Admin Login
+          </h1>
 
-        <input
-          type="email"
-          placeholder="Admin Email"
-          className="w-full border p-3 mb-4"
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          <p className="mt-2 font-body text-sm text-greyText">
+            Sign in to manage Celine Esthétique dashboard.
+          </p>
+        </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full border p-3 mb-6"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="space-y-4">
+          <AdminInput
+            name="email"
+            type="email"
+            placeholder="Admin Email"
+            value={formData.email}
+            onChange={handleChange}
+          />
 
-        <button className="w-full bg-[#D4AF37] py-3 rounded-full">
-          Login as Admin
-        </button>
+          <AdminInput
+            name="password"
+            type="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="mt-6">
+          <AdminButton
+            type="submit"
+            text={loading ? "Logging in..." : "Login as Admin"}
+            variant="primary"
+            disabled={loading}
+          />
+        </div>
       </form>
     </div>
   );

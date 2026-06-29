@@ -8,7 +8,7 @@ import {
     orderBy,
   } from "firebase/firestore";
   
-  import { db } from "./firebase";
+  import { db } from "@/services/firebase/firebaseConfig";
   
   const usersRef = collection(db, "users");
   

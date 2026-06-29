@@ -1,54 +1,120 @@
+// React
 import { useState } from "react";
-import { loginUser } from "../../services/firebase/auth";
+
+// Packages
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
-  const navigate = useNavigate();   // keep here
+// Services
+import { loginUser } from "@/services/firebase/auth";
+import { getUserProfile } from "@/services/firebase/firestore";
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+// Components
+import AdminInput from "@/components/admin/AdminInput";
+import AdminButton from "@/components/admin/AdminButton";
+
+// Utils
+import { showSuccess, showError } from "@/utils/toast";
+
+const Login = () => {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const validateForm = () => {
+    if (!formData.email || !formData.password) {
+      showError("Please enter email and password.");
+      return false;
+    }
+
+    return true;
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    if (!validateForm()) return;
+
     try {
-      await loginUser(email, password);
-      alert("Login successful");
-      navigate("/admin");   // move inside try block
+      setLoading(true);
+
+      const userCredential = await loginUser(
+        formData.email,
+        formData.password
+      );
+
+      const profile = await getUserProfile(userCredential.user.uid);
+
+      showSuccess("Login successful.");
+
+      if (profile?.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
     } catch (error) {
-      alert(error.message);
+      console.error("Login error:", error);
+      showError(error.message || "Failed to login.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F9E4E0] flex items-center justify-center p-6">
+    <div className="flex min-h-screen items-center justify-center bg-softPink p-4">
       <form
         onSubmit={handleLogin}
-        className="bg-white w-full max-w-[420px] rounded-[20px] p-8 shadow-[0_8px_20px_rgba(0,0,0,0.08)]"
+        className="w-full max-w-[420px] rounded-[24px] border border-softPink bg-white p-6 shadow-md md:p-8"
       >
-        <h1 className="font-['Playfair_Display'] text-[36px] text-[#1A1A1A] mb-6">
-          Login
-        </h1>
+        <div className="mb-6 text-center">
+          <h1 className="font-heading text-3xl font-semibold text-darkText md:text-4xl">
+            Login
+          </h1>
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full border border-[#F9E4E0] rounded-[12px] px-4 py-3 mb-4"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+          <p className="mt-2 font-body text-sm text-greyText">
+            Sign in to access your account.
+          </p>
+        </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full border border-[#F9E4E0] rounded-[12px] px-4 py-3 mb-6"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="space-y-4">
+          <AdminInput
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+          />
 
-        <button className="w-full bg-[#D4AF37] text-[#1A1A1A] px-7 py-3 rounded-full font-semibold">
-          Login
-        </button>
+          <AdminInput
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="mt-6">
+          <AdminButton
+            type="submit"
+            text={loading ? "Logging in..." : "Login"}
+            variant="primary"
+            disabled={loading}
+          />
+        </div>
       </form>
     </div>
   );

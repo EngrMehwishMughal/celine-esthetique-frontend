@@ -1,5 +1,5 @@
-import AppRoutes from "./routes/AppRoutes";
-import useAuthListener from "./hooks/useAuthListener";
+import AppRoutes from "@/routes/AppRoutes";
+import useAuthListener from "@/hooks/useAuthListener";
 
 const App = () => {
   useAuthListener();

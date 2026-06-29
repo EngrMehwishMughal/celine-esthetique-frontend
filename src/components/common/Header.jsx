@@ -1,3 +1,4 @@
+// Icons
 import {
   FaUserCircle,
   FaWhatsapp,
@@ -5,7 +6,9 @@ import {
   FaInstagram,
 } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-import Navbar from "./Navbar";
+
+// Components
+import Navbar from "@/components/common/Navbar";
 
 const Header = () => {
   return (

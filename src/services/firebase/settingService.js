@@ -5,7 +5,7 @@ import {
     serverTimestamp,
   } from "firebase/firestore";
   
-  import { db } from "./firebase";
+  import { db } from "@/services/firebase/firebaseConfig";
   
   const settingsRef = doc(db, "settings", "salon");
   
